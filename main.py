@@ -48,7 +48,7 @@ while True: #Petlja koja vrti prompt
             print('Naredba prima barem jedan argument')
         else:
             for word in lista_sa_naredbom[1:]:
-                if(re.match('"^[^\s\"]+\"[^\s\"]+$"', word)):
+                if re.match(r'"^[^\s\"]+\"[^\s\"]+$"', word):
                     print(word)
                 else:
                     izmjena = word.replace('"', '')
