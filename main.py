@@ -10,7 +10,10 @@ trenutno_vrijeme = strftime("%d.%m.%Y. %H:%M:%S", localtime()) #Vrijeme
 print('Pozdrav, dobro dosao...')
 print('Datum i vrijeme vaseg pristupa: {}'.format(trenutno_vrijeme))
 
-korisnik, host, adresa = os.getlogin(), socket.gethostname(), os.path.abspath(os.getcwd())
+korisnik, host, adresa, kucni_dir = os.getlogin(), socket.gethostname(), os.path.abspath(os.getcwd()), os.getenv("HOME")
+
+povijest = kucni_dir + '/.povijest'
+print(povijest)
 while True: #Petlja koja vrti prompt
     naredba = input('[{0}@{1}:{2}]$ '.format(korisnik, host, adresa)) #Prompt/odzivni znak
     if naredba == 'exit' or naredba == 'logout':
@@ -22,20 +25,34 @@ while True: #Petlja koja vrti prompt
     if re.match(r"(pwd\s+.*)|(pwd$)", naredba): #pwd naredba
         if re.match(r"pwd\s*$", naredba):
             print(os.path.abspath(os.getcwd()))
+            dat = open(povijest, 'a')
+            dat.write(naredba)
+            dat.write('\n')
+            dat.close()
         else:
             print('Naredba ne prima parametre ni argumente')
             
     elif re.match(r"(ps\s+.*)|(ps$)", naredba): #ps naredba
         if re.match(r"ps\s*$", naredba):
             print(os.getpid())
+            dat = open(povijest, 'a')
+            dat.write(naredba)
+            dat.write('\n')
+            dat.close()
+            
         else:
             print('Nepostojeci parametar ili argument')
             
     elif re.match(r"(echo\s+.*)|(echo$)", naredba):
         if re.match(r"echo\s*$", naredba):
             print('Naredba prima barem jedan argument')
-        elif re.match(r'echo\s\"*.*\"*$')
-            print('"Nepostojeci parametar ili argument"')
+        else:
+            for word in lista_sa_naredbom[1:]:
+                if(re.match('"^[^\s\"]+\"[^\s\"]+$"', word)):
+                    print(word)
+                else:
+                    izmjena = word.replace('"', '')
+                    print(izmjena)
         
     elif naredba == "kill":
         print(naredba)
