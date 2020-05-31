@@ -63,12 +63,18 @@ while True: #Petlja koja vrti prompt
     elif naredba == "kill":
         print(naredba)
     elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba
-        def korak_nazad(adresa):
+        def korak_nazad(adresa, do_kud):
             trenutna = adresa.split('/')
             nova_adresa = ""
-            for ele in trenutna[1:-1]:
-                nova_adresa += "/"
-                nova_adresa += ele
+            if do_kud != 0:
+                for ele in trenutna[1:do_kud]:
+                    nova_adresa += "/"
+                    nova_adresa += ele
+            else:
+                for ele in trenutna[1:]:
+                    nova_adresa += "/"
+                    nova_adresa += ele
+                    
             return nova_adresa
             
         if re.match(r"^cd\s*$", naredba):
@@ -76,8 +82,12 @@ while True: #Petlja koja vrti prompt
         elif re.match(r"cd\s\.{1}\s*$", naredba):
             continue
         elif re.match(r"cd\s\.{2}\s*", naredba):
-            os.environ['prethodna'] = korak_nazad(adresa)
+            os.environ['prethodna'] = korak_nazad(adresa, -1)
             os.chdir(os.environ['prethodna'])
+        elif re.match(r"cd\s\.{0,1}(\/.*)*", naredba):
+            os.environ['prethodna'] = korak_nazad(naredba, 0)
+            os.chdir(os.environ['prethodna'])
+            print(os.environ['prethodna'])
 
             
         
