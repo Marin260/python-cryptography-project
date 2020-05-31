@@ -64,8 +64,15 @@ while True: #Petlja koja vrti prompt
         print(naredba)
     elif naredba == "cd":
         print(naredba)
-    elif naredba == "date":
-        print(naredba)
+    elif re.match(r"(date\s+.*)|(date$)", naredba): #date naredba
+        if re.match(r"date\s*$", naredba):
+                print (time.strftime("%H::%M::%S  %A  %d/%m/%Y"))
+                upis_u_dat(naredba, povijest)
+        elif re.match(r"date -r\s*$", naredba):
+                print (time.strftime("%d/%m/%Y  %A  %H::%M::%S"))
+                upis_u_dat(naredba, povijest)
+        else:
+                print('Nepostojeci parametar ili argument')
     elif naredba == "ls":
         print(naredba)
     elif naredba == "mkdir":
@@ -77,4 +84,4 @@ while True: #Petlja koja vrti prompt
     elif re.match(r"\s*$", naredba):
         continue
     else:
-        print('pogrsna naredba')
+        print('pogresna naredba')
