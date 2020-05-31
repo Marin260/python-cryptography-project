@@ -1,3 +1,4 @@
+from os.path import expanduser
 from time import *
 import threading
 import getpass
@@ -10,7 +11,7 @@ trenutno_vrijeme = strftime("%d.%m.%Y. %H:%M:%S", localtime()) #Vrijeme
 print('Pozdrav, dobro dosao...')
 print('Datum i vrijeme vaseg pristupa: {}'.format(trenutno_vrijeme))
 
-korisnik, host, adresa = os.getlogin(), socket.gethostname(), os.path.abspath(os.getcwd())
+korisnik, host, adresa, kucni_dir = os.getlogin(), socket.gethostname(), os.path.abspath(os.getcwd()), expanduser("~")
 while True: #Petlja koja vrti prompt
     naredba = input('[{0}@{1}:{2}]$ '.format(korisnik, host, adresa)) #Prompt/odzivni znak
     if naredba == 'exit' or naredba == 'logout':
