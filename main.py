@@ -157,6 +157,7 @@ while True: #Petlja koja vrti prompt
             args=parse_args()
             ls(args)
             upis_u_dat(naredba, povijest)
+<<<<<<< HEAD
         elif re.match(r"ls -[^l]*\s*$", naredba):
             print('Nepostojeci parametar')
         
@@ -164,6 +165,48 @@ while True: #Petlja koja vrti prompt
         print(naredba)
     elif naredba == "rmdir":
         print(naredba)
+=======
+        elif re.match(r"ls -[^l]\s*$", naredba):
+            print('Nepostojeci parametar')    
+            
+    elif re.match(r"(mkdir\s+.*)|(mkdir$)", naredba):  #mkdir naredba
+        if re.match(r"mkdir\s*$", naredba):
+            print("Naredba mora primiti argument")
+        elif (len(lista_sa_naredbom)>=3):       #ako naredba ima vise od jednog argumenta javi gresku
+            print ("Naredba ne smije imati vise od jednog argumenta")
+        else:
+            for word in lista_sa_naredbom[1:2]:
+                argument=word
+            print("naredba je primila argument: ",argument) #za debug, obrisi za release
+            try:
+                os.makedirs(argument)
+            except FileExistsError:
+                print("Ovaj direktorij vec postoji!")
+            except OSError:
+                print("Stvaranje direktorija nije uspjelo!")
+            else:
+                print("Naredba izvrsena")
+            upis_u_dat(naredba, povijest)
+        
+    elif re.match(r"(rmdir\s+.*)|(rmdir$)", naredba):   #rmdir
+        if re.match(r"rmdir\s*$", naredba):
+            print("Naredba mora primiti argument")
+        elif (len(lista_sa_naredbom)>=3):   #ako naredba ima vise od jednog argumenta javi gresku
+            print ("Naredba ne smije imati vise od jednog argumenta")
+        else:
+            for word in lista_sa_naredbom[1:2]:
+                argument=word
+            print("naredba je primila argument: ",argument) #za debug, obrisi za release
+            try:
+                os.rmdir(argument)
+            except FileNotFoundError:
+                print("Datoteka nije pronadena!")
+            except OSError:
+                print("Brisanje datoteke nije uspjelo, direktorij nije prazan")
+            else:
+                print("Naredba izvrsena")
+                upis_u_dat(naredba, povijest)
+>>>>>>> e6daf8a821849082973aaffcac02ae2ffb5fa0bd
     elif naredba == "kub":
         print(naredba)
     elif re.match(r"\s*$", naredba):
