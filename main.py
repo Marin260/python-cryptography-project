@@ -4,6 +4,8 @@ import getpass
 import socket
 import os
 import re
+import time
+import argparse
 
 def upis_u_dat(var, ime_dat): #upis naredbi u dat
     dat = open(ime_dat, 'a')
@@ -103,8 +105,54 @@ while True: #Petlja koja vrti prompt
         else:
             print('Nepostojeci argument')
     
-    elif naredba == "ls":
-        print(naredba)
+    elif re.match(r"(ls\s+.*)|(ls$)", naredba): #ls naredba
+        if re.match(r"ls\s*$", naredba):
+            def lsnohidden(path):
+                for f in os.listdir(path):
+                    if not f.startswith('.'):
+                        print (f)
+            lsnohidden((os.getcwd()))
+            upis_u_dat(naredba, povijest)
+        elif re.match(r"ls -l\s*$", naredba):
+            def parse_args():
+                parser=argparse.ArgumentParser(description='Izlistaj sve fajlove u direktoriju')
+                parser.add_argument('directory', type=str, nargs='?', default='.')
+                parser.add_argument('--long','-l', action='store_true')
+                return parser.parse_args()
+            def ls(args):
+                
+                    from pwd import getpwuid
+                    from grp import getgrgid
+                    import pprint
+                    for f in listdir(args):
+                        filestats=os.lstat(os.path.join(args.directory,f))
+                        mode_chars=['r','w','x']
+                        st_perms=bin(filestats.st_mode)[-9:]
+                        mode=filetype_char(filestats.st_mode)
+                        for i, perm in enumerate(st_perms):
+                            if perm=='0':
+                                mode+='-'
+                            else:
+                                mode+=mode_chars[i%3] 
+                        entry=[mode,str(filestats.st_nlink),getpwuid(filestats.st_uid).pw_name,getgrgid(filestats.st_gid).gr_name,str(filestats.st_size),f]                          
+                        pprint.pprint(entry)               
+            def filetype_char(mode):
+                import stat
+                if stat.S_ISDIR(mode):
+                    return 'd'
+                if stat.S_ISLNK(mode):
+                    return 'l'
+                return '-'
+            def listdir(args):
+               dirs=os.listdir(args.directory)
+               dirs=[dir for dir in dirs if dir[0]!='.']
+               return dirs
+            args=parse_args()
+            ls(args)
+            upis_u_dat(naredba, povijest)
+        elif re.match(r"ls -[^l]\s*$", naredba):
+            print('Nepostojeci parametar')    
+            
     elif naredba == "mkdir":
         print(naredba)
     elif naredba == "rmdir":
