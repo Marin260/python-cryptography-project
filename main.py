@@ -20,7 +20,7 @@ kucni_dir = os.getenv("HOME")
 
 povijest = kucni_dir + '/.povijest'
 while True: #Petlja koja vrti prompt
-    korisnik, host, adresa = os.getlogin(), socket.gethostname(), os.path.abspath(os.getcwd())
+    korisnik, host, adresa = getpass.getuser(), socket.gethostname(), os.path.abspath(os.getcwd())
     naredba = input('[{0}@{1}:{2}]$ '.format(korisnik, host, adresa)) #Prompt/odzivni znak
     if naredba == 'exit' or naredba == 'logout':
         break;
@@ -83,13 +83,15 @@ while True: #Petlja koja vrti prompt
             continue
         elif re.match(r"cd\s\.{2}\s*", naredba):
             os.environ['prethodna'] = korak_nazad(adresa, -1)
-            os.chdir(os.environ['prethodna'])
+            try:
+                os.chdir(os.environ['prethodna'])
+            except OSError:
+                print('Nemate pristup / direktoriju')
         elif re.match(r"cd\s\.{0,1}(\/.*)*", naredba):
-            os.environ['prethodna'] = korak_nazad(naredba, 0)
-            os.chdir(os.environ['prethodna'])
-            print(os.environ['prethodna'])
-
-            
+            try:
+                os.chdir(korak_nazad(naredba, 0))
+            except OSError:
+                print('Upisana adresa ne postoji')
         
     elif re.match(r"(date\s.*)|(date\s*$)", naredba): #date naredba
         if re.match(r"date\s*$", naredba):
