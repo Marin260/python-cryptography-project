@@ -65,8 +65,9 @@ while True: #Petlja koja vrti prompt
     elif naredba == "kill":
         print(naredba)
     elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba
-        def korak_nazad(adresa, do_kud):
-            trenutna = adresa.split('/')
+        def korak_nazad(put, do_kud):
+            trenutna = put.split('/')
+            print(trenutna)
             nova_adresa = ""
             if do_kud != 0:
                 for ele in trenutna[1:do_kud]:
@@ -89,11 +90,14 @@ while True: #Petlja koja vrti prompt
                 os.chdir(os.environ['prethodna'])
             except OSError:
                 print('Nemate pristup / direktoriju')
-        elif re.match(r"cd\s\.{0,1}(\/.*)*", naredba):
+        elif re.match(r"cd\s\.{0,1}(\/[^\.\.]+)+", naredba):
             try:
                 os.chdir(korak_nazad(naredba, 0))
             except OSError:
                 print('Upisana adresa ne postoji')
+        else:
+            print('Kriva naredba')
+            
         
     elif re.match(r"(date\s.*)|(date\s*$)", naredba): #date naredba
         if re.match(r"date\s*$", naredba):
@@ -105,6 +109,7 @@ while True: #Petlja koja vrti prompt
         elif re.match(r"date -[^r]\s*$", naredba):
             print('Nepostojeci parametar')
         else:
+            
             print('Nepostojeci argument')
     
     elif re.match(r"(ls\s+.*)|(ls$)", naredba): #ls naredba
@@ -152,9 +157,9 @@ while True: #Petlja koja vrti prompt
             args=parse_args()
             ls(args)
             upis_u_dat(naredba, povijest)
-        elif re.match(r"ls -[^l]\s*$", naredba):
-            print('Nepostojeci parametar')    
-            
+        elif re.match(r"ls -[^l]*\s*$", naredba):
+            print('Nepostojeci parametar')
+        
     elif naredba == "mkdir":
         print(naredba)
     elif naredba == "rmdir":
