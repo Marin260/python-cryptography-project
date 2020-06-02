@@ -26,6 +26,7 @@ povijest = kucni_dir + '/.povijest'
 while True: #Petlja koja vrti prompt
     korisnik, host, adresa = getpass.getuser(), socket.gethostname(), os.path.abspath(os.getcwd())
     naredba = input('[{0}@{1}:{2}]$ '.format(korisnik, host, adresa)) #Prompt/odzivni znak
+    print(naredba)
     if naredba == 'exit' or naredba == 'logout':
         break;
     lista_sa_naredbom = naredba.split()
@@ -83,33 +84,42 @@ while True: #Petlja koja vrti prompt
             os.kill(os.getpid(), signal.SIGTERM)
     elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba
         def korak_nazad(put, do_kud):
-            trenutna = put.split('/')
-            print(trenutna)
             nova_adresa = ""
-            if do_kud != 0:
-                for ele in trenutna[1:do_kud]:
+            trenutna = ""
+            trenutna = trenutna.join(put[1])
+            trenutna = trenutna.split('/')
+            print(trenutna)
+            absolutna = os.path.abspath(os.getcwd())
+            absolutna = absolutna.split('/')
+            iste = False
+            print('ovo je abs {}'.format(absolutna))
+            print('ovo je upi {}'.format(trenutna))
+            print(len(trenutna))
+            if len(trenutna) > 1:
+                if absolutna[1] == trenutna[1]:
+                    iste = True
+            if iste == False:
+                print('uso sam')
+                for x in absolutna:
+                    if x == "." or x == '':
+                        continue
                     nova_adresa += "/"
-                    nova_adresa += ele
-            else:
-                for ele in trenutna[1:]:
-                    nova_adresa += "/"
-                    nova_adresa += ele
-                    
+                    nova_adresa += x
+                print('ovo je nov {}'.format(nova_adresa))
+            for ele in trenutna:
+                if ele == "." or ele == '':
+                    continue
+                nova_adresa += "/"
+                nova_adresa += ele
+            print('ovo je nov {}'.format(nova_adresa))
             return nova_adresa
             
         if re.match(r"^cd\s*$", naredba):
             os.chdir(kucni_dir)
-        elif re.match(r"cd\s\.{1}\s*$", naredba):
-            continue
-        elif re.match(r"cd\s\.{2}\s*", naredba):
-            os.environ['prethodna'] = korak_nazad(adresa, -1)
+        elif re.match(r"cd\s+(\.{0,2}(\/.*)+)|([^\/]+\/{1})+|([^\/]+)", naredba):
+            print(naredba.split())
             try:
-                os.chdir(os.environ['prethodna'])
-            except OSError:
-                print('Nemate pristup / direktoriju')
-        elif re.match(r"cd\s\.{0,1}(\/[^\.\.]*)+", naredba):
-            try:
-                os.chdir(korak_nazad(naredba, 0))
+                os.chdir(korak_nazad(naredba.split(), 0))
             except OSError:
                 print('Upisana adresa ne postoji')
         else:
