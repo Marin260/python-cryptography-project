@@ -6,6 +6,8 @@ import os
 import re
 import time
 import argparse
+import signal
+import sys
 
 def upis_u_dat(var, ime_dat): #upis naredbi u dat
     dat = open(ime_dat, 'a')
@@ -62,8 +64,23 @@ while True: #Petlja koja vrti prompt
             
         
         
-    elif naredba == "kill":
-        print(naredba)
+    elif re.match(r"(kill\s+.*)|(kill$)", naredba): #kill naredba
+        if re.match(r"kill\s*$", naredba):
+            print('Naredba prima tocno jedan parametar: naziv signala ili njegov redni broj')
+        elif re.match(r"(kill -2\s*$)|(kill -SIGINT\s*$)|(kill -INT\s*$)", naredba):
+            def upravljac(broj_signala, stog):
+                print('Pristiago je signal broj 2: Program se zavrsava.'.format(broj_signala))
+                sys.exit()
+                return
+            signal.signal(signal.SIGINT,upravljac) 
+            os.kill(os.getpid(), signal.SIGINT)
+        elif re.match(r"(kill -3\s*$)|(kill -SIGQUIT\s*$)|(kill -QUIT\s*$)", naredba):
+            signal.signal(signal.SIGQUIT,signal.SIG_IGN) 
+            os.kill(os.getpid(), signal.SIGQUIT)
+            print('Signal broj 3 je ignoriran')
+        elif re.match(r"(kill -15\s*$)|(kill -SIGTERM\s*$)|(kill -TERM\s*$)", naredba):
+            signal.signal(signal.SIGTERM,signal.SIG_DFL)
+            os.kill(os.getpid(), signal.SIGTERM)
     elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba
         def korak_nazad(adresa, do_kud):
             trenutna = adresa.split('/')
