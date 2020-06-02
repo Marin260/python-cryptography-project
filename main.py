@@ -8,6 +8,7 @@ import time
 import argparse
 import signal
 import sys
+from pathlib import Path #za windows compatibility
 
 def upis_u_dat(var, ime_dat): #upis naredbi u dat
     dat = open(ime_dat, 'a')
@@ -20,7 +21,8 @@ trenutno_vrijeme = strftime("%d.%m.%Y. %H:%M:%S", localtime()) #Vrijeme
 print('Pozdrav, dobro dosao...')
 print('Datum i vrijeme vaseg pristupa: {}'.format(trenutno_vrijeme))
 
-kucni_dir = os.getenv("HOME")
+#kucni_dir = os.getenv("HOME")  #radi samo s unixom, na windowsu ne
+kucni_dir = str(Path.home())    
 
 povijest = kucni_dir + '/.povijest'
 while True: #Petlja koja vrti prompt
@@ -32,21 +34,21 @@ while True: #Petlja koja vrti prompt
     lista_sa_naredbom = naredba.split()
     if naredba != "":
         print(lista_sa_naredbom)
-        
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~pwd naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
     if re.match(r"(pwd\s+.*)|(pwd$)", naredba): #pwd naredba
         if re.match(r"pwd\s*$", naredba):
             print(os.path.abspath(os.getcwd()))
             upis_u_dat(naredba, povijest)
         else:
             print('Naredba ne prima parametre ni argumente')
-            
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~ps naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~           
     elif re.match(r"(ps\s+.*)|(ps$)", naredba): #ps naredba
         if re.match(r"ps\s*$", naredba):
             print(os.getpid())
             upis_u_dat(naredba, povijest)
         else:
             print('Nepostojeci parametar ili argument')
-            
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~echo naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            
     elif re.match(r"(echo\s+.*)|(echo$)", naredba): #echo naredba
         if re.match(r"echo\s*$", naredba):
             print('Naredba prima barem jedan argument')
@@ -62,9 +64,7 @@ while True: #Petlja koja vrti prompt
                 else:
                     print(word, end=" ")
             print()
-            
-        
-        
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~kill naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            
     elif re.match(r"(kill\s+.*)|(kill$)", naredba): #kill naredba
         if re.match(r"kill\s*$", naredba):
             print('Naredba prima tocno jedan parametar: naziv signala ili njegov redni broj')
@@ -75,13 +75,17 @@ while True: #Petlja koja vrti prompt
                 return
             signal.signal(signal.SIGINT,upravljac) 
             os.kill(os.getpid(), signal.SIGINT)
+            upis_u_dat(naredba, povijest)
         elif re.match(r"(kill -3\s*$)|(kill -SIGQUIT\s*$)|(kill -QUIT\s*$)", naredba):
             signal.signal(signal.SIGQUIT,signal.SIG_IGN) 
             os.kill(os.getpid(), signal.SIGQUIT)
             print('Signal broj 3 je ignoriran')
+            upis_u_dat(naredba, povijest)
         elif re.match(r"(kill -15\s*$)|(kill -SIGTERM\s*$)|(kill -TERM\s*$)", naredba):
             signal.signal(signal.SIGTERM,signal.SIG_DFL)
             os.kill(os.getpid(), signal.SIGTERM)
+            upis_u_dat(naredba, povijest)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~cd naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba
         def korak_nazad(put, do_kud):
             nova_adresa = ""
@@ -122,10 +126,14 @@ while True: #Petlja koja vrti prompt
                 os.chdir(korak_nazad(naredba.split(), 0))
             except OSError:
                 print('Upisana adresa ne postoji')
+<<<<<<< HEAD
         else:
             print('Kriva naredba')
             
         
+=======
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~date naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~       
+>>>>>>> b256191e9af7d3baacd0ceafb1305335f7e1adef
     elif re.match(r"(date\s.*)|(date\s*$)", naredba): #date naredba
         if re.match(r"date\s*$", naredba):
             print (strftime("%H::%M::%S  %A  %d/%m/%Y"))
@@ -138,7 +146,7 @@ while True: #Petlja koja vrti prompt
         else:
             
             print('Nepostojeci argument')
-    
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~ls naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
     elif re.match(r"(ls\s+.*)|(ls$)", naredba): #ls naredba
         if re.match(r"ls\s*$", naredba):
             def lsnohidden(path):
@@ -184,6 +192,7 @@ while True: #Petlja koja vrti prompt
             args=parse_args()
             ls(args)
             upis_u_dat(naredba, povijest)
+<<<<<<< HEAD
         elif re.match(r"ls -[^l]*\s*$", naredba):
             print('Nepostojeci parametar')
         
@@ -194,6 +203,11 @@ while True: #Petlja koja vrti prompt
     elif re.match(r"ls -[^l]\s*$", naredba):
         print('Nepostojeci parametar')    
             
+=======
+        elif re.match(r"ls -[^l]\s*$", naredba):
+            print('Nepostojeci parametar')    
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~mkdir naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            
+>>>>>>> b256191e9af7d3baacd0ceafb1305335f7e1adef
     elif re.match(r"(mkdir\s+.*)|(mkdir$)", naredba):  #mkdir naredba
         if re.match(r"mkdir\s*$", naredba):
             print("Naredba mora primiti argument")
@@ -212,7 +226,7 @@ while True: #Petlja koja vrti prompt
             else:
                 print("Naredba izvrsena")
             upis_u_dat(naredba, povijest)
-        
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~rmdir naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
     elif re.match(r"(rmdir\s+.*)|(rmdir$)", naredba):   #rmdir
         if re.match(r"rmdir\s*$", naredba):
             print("Naredba mora primiti argument")
@@ -231,8 +245,10 @@ while True: #Petlja koja vrti prompt
             else:
                 print("Naredba izvrsena")
                 upis_u_dat(naredba, povijest)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~kub naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~              
     elif naredba == "kub":
         print(naredba)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
     elif re.match(r"\s*$", naredba):
         continue
     else:
