@@ -22,7 +22,7 @@ print('Pozdrav, dobro dosao...')
 print('Datum i vrijeme vaseg pristupa: {}'.format(trenutno_vrijeme))
 
 #kucni_dir = os.getenv("HOME")  #radi samo s unixom, na windowsu ne
-kucni_dir = str(Path.home())    #radi na windowsu i vjerojatno na unixu
+kucni_dir = str(Path.home())    
 
 povijest = kucni_dir + '/.povijest'
 while True: #Petlja koja vrti prompt
