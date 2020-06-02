@@ -90,7 +90,7 @@ while True: #Petlja koja vrti prompt
                 os.chdir(os.environ['prethodna'])
             except OSError:
                 print('Nemate pristup / direktoriju')
-        elif re.match(r"cd\s\.{0,1}(\/[^\.\.]*)+", naredba):
+        elif re.match(r"cd\s\.{0,2}(\/[^\.\.]*)+", naredba):
             try:
                 os.chdir(korak_nazad(naredba, 0))
             except OSError:
