@@ -8,6 +8,7 @@ import time
 import argparse
 import signal
 import sys
+from pathlib import Path #za windows compatibility
 
 def upis_u_dat(var, ime_dat): #upis naredbi u dat
     dat = open(ime_dat, 'a')
@@ -20,7 +21,8 @@ trenutno_vrijeme = strftime("%d.%m.%Y. %H:%M:%S", localtime()) #Vrijeme
 print('Pozdrav, dobro dosao...')
 print('Datum i vrijeme vaseg pristupa: {}'.format(trenutno_vrijeme))
 
-kucni_dir = os.getenv("HOME")
+#kucni_dir = os.getenv("HOME")  #radi samo s unixom, na windowsu ne
+kucni_dir = str(Path.home())    #radi na windowsu i vjerojatno na unixu
 
 povijest = kucni_dir + '/.povijest'
 while True: #Petlja koja vrti prompt
