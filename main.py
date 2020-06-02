@@ -72,13 +72,16 @@ while True: #Petlja koja vrti prompt
                 return
             signal.signal(signal.SIGINT,upravljac) 
             os.kill(os.getpid(), signal.SIGINT)
+            upis_u_dat(naredba, povijest)
         elif re.match(r"(kill -3\s*$)|(kill -SIGQUIT\s*$)|(kill -QUIT\s*$)", naredba):
             signal.signal(signal.SIGQUIT,signal.SIG_IGN) 
             os.kill(os.getpid(), signal.SIGQUIT)
             print('Signal broj 3 je ignoriran')
+            upis_u_dat(naredba, povijest)
         elif re.match(r"(kill -15\s*$)|(kill -SIGTERM\s*$)|(kill -TERM\s*$)", naredba):
             signal.signal(signal.SIGTERM,signal.SIG_DFL)
             os.kill(os.getpid(), signal.SIGTERM)
+            upis_u_dat(naredba, povijest)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~cd naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba
         def korak_nazad(adresa, do_kud):
