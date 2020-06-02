@@ -126,14 +126,10 @@ while True: #Petlja koja vrti prompt
                 os.chdir(korak_nazad(naredba.split(), 0))
             except OSError:
                 print('Upisana adresa ne postoji')
-<<<<<<< HEAD
         else:
             print('Kriva naredba')
-            
         
-=======
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~date naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~       
->>>>>>> b256191e9af7d3baacd0ceafb1305335f7e1adef
     elif re.match(r"(date\s.*)|(date\s*$)", naredba): #date naredba
         if re.match(r"date\s*$", naredba):
             print (strftime("%H::%M::%S  %A  %d/%m/%Y"))
@@ -192,7 +188,6 @@ while True: #Petlja koja vrti prompt
             args=parse_args()
             ls(args)
             upis_u_dat(naredba, povijest)
-<<<<<<< HEAD
         elif re.match(r"ls -[^l]*\s*$", naredba):
             print('Nepostojeci parametar')
         
@@ -203,11 +198,9 @@ while True: #Petlja koja vrti prompt
     elif re.match(r"ls -[^l]\s*$", naredba):
         print('Nepostojeci parametar')    
             
-=======
-        elif re.match(r"ls -[^l]\s*$", naredba):
-            print('Nepostojeci parametar')    
+    elif re.match(r"ls -[^l]\s*$", naredba):
+        print('Nepostojeci parametar')    
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~mkdir naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            
->>>>>>> b256191e9af7d3baacd0ceafb1305335f7e1adef
     elif re.match(r"(mkdir\s+.*)|(mkdir$)", naredba):  #mkdir naredba
         if re.match(r"mkdir\s*$", naredba):
             print("Naredba mora primiti argument")
