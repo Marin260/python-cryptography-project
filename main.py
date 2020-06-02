@@ -28,12 +28,9 @@ povijest = kucni_dir + '/.povijest'
 while True: #Petlja koja vrti prompt
     korisnik, host, adresa = getpass.getuser(), socket.gethostname(), os.path.abspath(os.getcwd())
     naredba = input('[{0}@{1}:{2}]$ '.format(korisnik, host, adresa)) #Prompt/odzivni znak
-    print(naredba)
     if naredba == 'exit' or naredba == 'logout':
         break;
     lista_sa_naredbom = naredba.split()
-    if naredba != "":
-        print(lista_sa_naredbom)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~pwd naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
     if re.match(r"(pwd\s+.*)|(pwd$)", naredba): #pwd naredba
         if re.match(r"pwd\s*$", naredba):
@@ -92,36 +89,30 @@ while True: #Petlja koja vrti prompt
             trenutna = ""
             trenutna = trenutna.join(put[1])
             trenutna = trenutna.split('/')
-            print(trenutna)
             absolutna = os.path.abspath(os.getcwd())
             absolutna = absolutna.split('/')
             iste = False
-            print('ovo je abs {}'.format(absolutna))
-            print('ovo je upi {}'.format(trenutna))
-            print(len(trenutna))
             if len(trenutna) > 1:
                 if absolutna[1] == trenutna[1]:
                     iste = True
             if iste == False:
-                print('uso sam')
                 for x in absolutna:
                     if x == "." or x == '':
                         continue
                     nova_adresa += "/"
                     nova_adresa += x
-                print('ovo je nov {}'.format(nova_adresa))
             for ele in trenutna:
                 if ele == "." or ele == '':
                     continue
                 nova_adresa += "/"
                 nova_adresa += ele
-            print('ovo je nov {}'.format(nova_adresa))
             return nova_adresa
             
         if re.match(r"^cd\s*$", naredba):
             os.chdir(kucni_dir)
         elif re.match(r"cd\s+(\.{0,2}(\/.*)+)|([^\/]+\/{1})+|([^\/]+)", naredba):
             print(naredba.split())
+
             try:
                 os.chdir(korak_nazad(naredba.split(), 0))
             except OSError:
@@ -209,15 +200,12 @@ while True: #Petlja koja vrti prompt
         else:
             for word in lista_sa_naredbom[1:2]:
                 argument=word
-            print("naredba je primila argument: ",argument) #za debug, obrisi za release
             try:
                 os.makedirs(argument)
             except FileExistsError:
                 print("Ovaj direktorij vec postoji!")
             except OSError:
                 print("Stvaranje direktorija nije uspjelo!")
-            else:
-                print("Naredba izvrsena")
             upis_u_dat(naredba, povijest)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~rmdir naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
     elif re.match(r"(rmdir\s+.*)|(rmdir$)", naredba):   #rmdir
@@ -228,16 +216,13 @@ while True: #Petlja koja vrti prompt
         else:
             for word in lista_sa_naredbom[1:2]:
                 argument=word
-            print("naredba je primila argument: ",argument) #za debug, obrisi za release
             try:
                 os.rmdir(argument)
             except FileNotFoundError:
                 print("Datoteka nije pronadena!")
             except OSError:
                 print("Brisanje datoteke nije uspjelo, direktorij nije prazan")
-            else:
-                print("Naredba izvrsena")
-                upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, povijest)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~kub naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~              
     elif naredba == "kub":
         print(naredba)
