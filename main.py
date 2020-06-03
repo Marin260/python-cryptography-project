@@ -192,37 +192,37 @@ while True: #Petlja koja vrti prompt
             print('Nepostojeci parametar')
             
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~mkdir naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            
-    elif re.match(r"(mkdir\s+.*)|(mkdir$)", naredba):  #mkdir naredba
-        if re.match(r"mkdir\s*$", naredba):
-            print("Naredba mora primiti argument")
+    elif re.match(r"(mkdir\s+.*)|(mkdir$)", naredba):  
+        if re.match(r"mkdir\s*$", naredba):             #regex za ako korisnik upise samo mkdir bez argumenata
+            print("Naredba mora primiti argument")     
         elif (len(lista_sa_naredbom)>=3):       #ako naredba ima vise od jednog argumenta javi gresku
-            print ("Naredba ne smije imati vise od jednog argumenta")
-        else:
-            for word in lista_sa_naredbom[1:2]:
-                argument=word
+            print ("Naredba ne smije imati vise od jednog argumenta")       
+        else:                                           #izvedi ovo ako je dobro upisana naredba
+            for word in lista_sa_naredbom[1:2]:         
+                argument=word                           
             try:
-                os.makedirs(argument)
-            except FileExistsError:
+                os.makedirs(argument)                   #stvaranje direktorija
+            except FileExistsError:                     #ako direktorij postoji, javi ovu gresku
                 print("Ovaj direktorij vec postoji!")
-            except OSError:
+            except OSError:                             #pri javljanju neke druge greske (npr ako nema mjesta na disku) javi ovu gresku
                 print("Stvaranje direktorija nije uspjelo!")
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, povijest)               #upis u povjest
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~rmdir naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
-    elif re.match(r"(rmdir\s+.*)|(rmdir$)", naredba):   #rmdir
-        if re.match(r"rmdir\s*$", naredba):
-            print("Naredba mora primiti argument")
-        elif (len(lista_sa_naredbom)>=3):   #ako naredba ima vise od jednog argumenta javi gresku
+    elif re.match(r"(rmdir\s+.*)|(rmdir$)", naredba):   
+        if re.match(r"rmdir\s*$", naredba):             #regex za ako korisnik upise samo rmdir bez ikakvih argumenata
+            print("Naredba mora primiti argument")      
+        elif (len(lista_sa_naredbom)>=3):               #ako naredba ima vise od jednog argumenta javi gresku
             print ("Naredba ne smije imati vise od jednog argumenta")
-        else:
-            for word in lista_sa_naredbom[1:2]:
+        else:                                           #izvedi ovo kad je naredba dobro upisana
+            for word in lista_sa_naredbom[1:2]:         
                 argument=word
             try:
-                os.rmdir(argument)
+                os.rmdir(argument)                      #brisanje direktorija
             except FileNotFoundError:
-                print("Datoteka nije pronadena!")
+                print("Direktorij nije pronadena!")       #greska koja se ispisuje ako je argument direktorij koji ne postoji
             except OSError:
-                print("Brisanje datoteke nije uspjelo, direktorij nije prazan")
-            upis_u_dat(naredba, povijest)
+                print("Brisanje direktorija nije uspjelo, direktorij nije prazan")     #greska koja se ispisuje kad direktorij koji se brise nije prazan
+            upis_u_dat(naredba, povijest)               #upis u povjest
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~kub naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~              
     elif naredba == "kub":
         print(naredba)
