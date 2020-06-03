@@ -16,7 +16,33 @@ def upis_u_dat(var, ime_dat): #upis naredbi u dat
     dat.write('\n')
     dat.close()
 
+def korak_nazad(put, do_kud):
+    nova_adresa = ""
+    trenutna = ""
+    trenutna = trenutna.join(put[1])
+    trenutna = trenutna.split('/')
+    absolutna = os.path.abspath(os.getcwd())
+    absolutna = absolutna.split('/')
+    iste = False
+    if len(trenutna) > 1:
+        if absolutna[1] == trenutna[1]:
+            iste = True
+    if iste == False:
+        for x in absolutna:
+            if x == "." or x == '':
+                continue
+            nova_adresa += "/"
+            nova_adresa += x
+    for ele in trenutna:
+        if ele == "." or ele == '':
+            continue
+        nova_adresa += "/"
+        nova_adresa += ele
+    return nova_adresa
+
 trenutno_vrijeme = strftime("%d.%m.%Y. %H:%M:%S", localtime()) #Vrijeme
+
+print(os.getcwd())
 
 print('Pozdrav, dobro dosao...')
 print('Datum i vrijeme vaseg pristupa: {}'.format(trenutno_vrijeme))
@@ -83,31 +109,9 @@ while True: #Petlja koja vrti prompt
             os.kill(os.getpid(), signal.SIGTERM)
             upis_u_dat(naredba, povijest)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~cd naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba
-        def korak_nazad(put, do_kud):
-            nova_adresa = ""
-            trenutna = ""
-            trenutna = trenutna.join(put[1])
-            trenutna = trenutna.split('/')
-            absolutna = os.path.abspath(os.getcwd())
-            absolutna = absolutna.split('/')
-            iste = False
-            if len(trenutna) > 1:
-                if absolutna[1] == trenutna[1]:
-                    iste = True
-            if iste == False:
-                for x in absolutna:
-                    if x == "." or x == '':
-                        continue
-                    nova_adresa += "/"
-                    nova_adresa += x
-            for ele in trenutna:
-                if ele == "." or ele == '':
-                    continue
-                nova_adresa += "/"
-                nova_adresa += ele
-            return nova_adresa
-            
+    
+
+    elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba    
         if re.match(r"^cd\s*$", naredba):
             os.chdir(kucni_dir)
         elif re.match(r"cd\s+(\.{0,2}(\/.*)+)|([^\/]+\/{1})+|([^\/]+)", naredba):
@@ -135,12 +139,12 @@ while True: #Petlja koja vrti prompt
             print('Nepostojeci argument')
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~ls naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
     elif re.match(r"(ls\s+.*)|(ls$)", naredba): #ls naredba
-        if re.match(r"ls\s*$", naredba):
+        if re.match(r"ls\s*./", naredba):
             def lsnohidden(path):
                 for f in os.listdir(path):
                     if not f.startswith('.'):
                         print (f)
-            lsnohidden((os.getcwd()))
+            lsnohidden(korak_nazad(naredba.split(), 0))
             upis_u_dat(naredba, povijest)
         elif re.match(r"ls -l\s*$", naredba):
             def parse_args():
