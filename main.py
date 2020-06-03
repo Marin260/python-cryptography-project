@@ -115,8 +115,6 @@ while True: #Petlja koja vrti prompt
     elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba    
         if re.match(r"^cd\s*$", naredba):
             os.chdir(kucni_dir)
-        #elif re.match(r"cd\s+\/+$", naredba):
-            #print('Kriva adresa')
         elif re.match(r"cd\s+(\.{0,2}(\/.*)+)|([^\/]+\/{1})+|([^\/]+)", naredba):
             try:
                 os.chdir(korak_nazad(naredba.split(), 0))
@@ -140,14 +138,14 @@ while True: #Petlja koja vrti prompt
             print('Nepostojeci argument')
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~ls naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
     elif re.match(r"(ls\s+.*)|(ls$)", naredba): #ls naredba
-        if re.match(r"ls\s*.*", naredba):
+        if re.match(r"(ls\s+[^\-]+.*)|(ls\s*$)", naredba):
             def lsnohidden(path):
                 for f in os.listdir(path):
                     if not f.startswith('.'):
                         print (f)
             if re.match(r"ls\s*$", naredba):
                 lsnohidden(os.getcwd())
-            else:
+            elif re.match(r"ls\s+[^\-]", naredba):
                 try:
                     lsnohidden(korak_nazad(naredba.split(), 0))
                 except OSError:
