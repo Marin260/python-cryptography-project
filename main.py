@@ -16,7 +16,7 @@ def upis_u_dat(var, ime_dat): #upis naredbi u dat
     dat.write('\n')
     dat.close()
 
-def korak_nazad(put, do_kud):
+def korak_nazad(put):
     nova_adresa = ""
     if len(put) == 2 and put[1] == '/':
         nova_adresa = "/"
@@ -117,7 +117,7 @@ while True: #Petlja koja vrti prompt
             os.chdir(kucni_dir)
         elif re.match(r"cd\s+(\.{0,2}(\/.*)+)|([^\/]+\/{1})+|([^\/]+)", naredba):
             try:
-                os.chdir(korak_nazad(naredba.split(), 0))
+                os.chdir(korak_nazad(naredba.split()))
             except OSError:
                 print('Upisana adresa ne postoji')
         else:
@@ -147,7 +147,7 @@ while True: #Petlja koja vrti prompt
                 lsnohidden(os.getcwd())
             elif re.match(r"ls\s+[^\-]", naredba):
                 try:
-                    lsnohidden(korak_nazad(naredba.split(), 0))
+                    lsnohidden(korak_nazad(naredba.split()))
                 except OSError:
                     print('Upisali ste krivu adresu')
             upis_u_dat(naredba, povijest)
