@@ -115,8 +115,6 @@ while True: #Petlja koja vrti prompt
     elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba    
         if re.match(r"^cd\s*$", naredba):
             os.chdir(kucni_dir)
-        #elif re.match(r"cd\s+\/+$", naredba):
-            #print('Kriva adresa')
         elif re.match(r"cd\s+(\.{0,2}(\/.*)+)|([^\/]+\/{1})+|([^\/]+)", naredba):
             try:
                 os.chdir(korak_nazad(naredba.split(), 0))
