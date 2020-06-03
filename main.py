@@ -190,16 +190,7 @@ while True: #Petlja koja vrti prompt
             upis_u_dat(naredba, povijest)
         elif re.match(r"ls -[^l]*\s*$", naredba):
             print('Nepostojeci parametar')
-        
-    elif naredba == "mkdir":
-        print(naredba)
-    elif naredba == "rmdir":
-        print(naredba)
-    elif re.match(r"ls -[^l]\s*$", naredba):
-        print('Nepostojeci parametar')    
             
-    elif re.match(r"ls -[^l]\s*$", naredba):
-        print('Nepostojeci parametar')    
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~mkdir naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            
     elif re.match(r"(mkdir\s+.*)|(mkdir$)", naredba):  #mkdir naredba
         if re.match(r"mkdir\s*$", naredba):
