@@ -140,7 +140,7 @@ while True: #Petlja koja vrti prompt
             print('Nepostojeci argument')
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~ls naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
     elif re.match(r"(ls\s+.*)|(ls$)", naredba): #ls naredba
-        if re.match(r"ls\s*.*", naredba):
+        if re.match(r"ls\s+[^\-]+.*", naredba):
             def lsnohidden(path):
                 for f in os.listdir(path):
                     if not f.startswith('.'):
