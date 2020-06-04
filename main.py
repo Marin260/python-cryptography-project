@@ -191,7 +191,7 @@ while True: #Petlja koja vrti prompt
                     for f in listdir():
                         var=naredba.split()
                         var=var[1:]
-                        filestats=os.lstat(os.path.join(korak_nazad(var,0),f))
+                        filestats=os.lstat(os.path.join(korak_nazad(var),f))
                         mode_chars=['r','w','x']
                         st_perms=bin(filestats.st_mode)[-9:]
                         mode=filetype_char(filestats.st_mode)
@@ -214,11 +214,13 @@ while True: #Petlja koja vrti prompt
             def listdir():
                var=naredba.split()
                var=var[1:]
-               dirs=os.listdir(korak_nazad(var,0))
+               dirs=os.listdir(korak_nazad(var))
                dirs=[dir for dir in dirs if dir[0]!='.']
                return dirs
-                
-            ls()
+            try:   
+                ls()
+            except FileNotFoundError:
+                print('Upisali ste krivu adresu')
             upis_u_dat(naredba, povijest)
         elif re.match(r"ls -l.*$", naredba):
             print('Nepostojeci parametar')
