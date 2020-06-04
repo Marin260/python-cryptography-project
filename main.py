@@ -5,7 +5,6 @@ import socket
 import os
 import re
 import time
-import argparse
 import signal
 import sys
 from pathlib import Path #za windows compatibility
@@ -152,18 +151,12 @@ while True: #Petlja koja vrti prompt
                     print('Upisali ste krivu adresu')
             upis_u_dat(naredba, povijest)
         elif re.match(r"ls -l\s*$", naredba):
-            def parse_args():
-                parser=argparse.ArgumentParser(description='Izlistaj sve fajlove u direktoriju')
-                parser.add_argument('directory', type=str, nargs='?', default='.')
-                parser.add_argument('--long','-l', action='store_true')
-                return parser.parse_args()
-            def ls(args):
-                
+            def ls():
                     from pwd import getpwuid
                     from grp import getgrgid
                     import pprint
-                    for f in listdir(args):
-                        filestats=os.lstat(os.path.join(args.directory,f))
+                    for f in listdir():
+                        filestats=os.lstat(os.path.join(os.getcwd(),f))
                         mode_chars=['r','w','x']
                         st_perms=bin(filestats.st_mode)[-9:]
                         mode=filetype_char(filestats.st_mode)
@@ -173,7 +166,43 @@ while True: #Petlja koja vrti prompt
                             else:
                                 mode+=mode_chars[i%3] 
                         entry=[mode,str(filestats.st_nlink),getpwuid(filestats.st_uid).pw_name,getgrgid(filestats.st_gid).gr_name,str(filestats.st_size),f]                          
-                        pprint.pprint(entry)               
+                        pprint.pprint(entry) 
+              
+           def filetype_char(mode):
+                import stat
+                if stat.S_ISDIR(mode):
+                    return 'd'
+                if stat.S_ISLNK(mode):
+                    return 'l'
+                return '-'
+            
+           def listdir():
+               dirs=os.listdir(os.getcwd())
+               dirs=[dir for dir in dirs if dir[0]!='.']
+               return dirs
+                
+           ls()
+           upis_u_dat(naredba, povijest)
+        elif re.match(r"ls\s+-l+[^\-]", naredba):
+            def ls():
+                    from pwd import getpwuid
+                    from grp import getgrgid
+                    import pprint
+                    for f in listdir():
+                        var=naredba.split()
+                        var=var[1:]
+                        filestats=os.lstat(os.path.join(korak_nazad(var,0),f))
+                        mode_chars=['r','w','x']
+                        st_perms=bin(filestats.st_mode)[-9:]
+                        mode=filetype_char(filestats.st_mode)
+                        for i, perm in enumerate(st_perms):
+                            if perm=='0':
+                                mode+='-'
+                            else:
+                                mode+=mode_chars[i%3] 
+                        entry=[mode,str(filestats.st_nlink),getpwuid(filestats.st_uid).pw_name,getgrgid(filestats.st_gid).gr_name,str(filestats.st_size),f]                          
+                        pprint.pprint(entry) 
+              
             def filetype_char(mode):
                 import stat
                 if stat.S_ISDIR(mode):
@@ -181,48 +210,53 @@ while True: #Petlja koja vrti prompt
                 if stat.S_ISLNK(mode):
                     return 'l'
                 return '-'
-            def listdir(args):
-               dirs=os.listdir(args.directory)
+            
+            def listdir():
+               var=naredba.split()
+               var=var[1:]
+               dirs=os.listdir(korak_nazad(var,0))
                dirs=[dir for dir in dirs if dir[0]!='.']
                return dirs
-            args=parse_args()
-            ls(args)
+                
+            ls()
             upis_u_dat(naredba, povijest)
+        elif re.match(r"ls -l.*$", naredba):
+            print('Nepostojeci parametar')
         elif re.match(r"ls -[^l]*\s*$", naredba):
             print('Nepostojeci parametar')
             
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~mkdir naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            
-    elif re.match(r"(mkdir\s+.*)|(mkdir$)", naredba):  #mkdir naredba
-        if re.match(r"mkdir\s*$", naredba):
-            print("Naredba mora primiti argument")
+    elif re.match(r"(mkdir\s+.*)|(mkdir$)", naredba):  
+        if re.match(r"mkdir\s*$", naredba):             #regex za ako korisnik upise samo mkdir bez argumenata
+            print("Naredba mora primiti argument")     
         elif (len(lista_sa_naredbom)>=3):       #ako naredba ima vise od jednog argumenta javi gresku
-            print ("Naredba ne smije imati vise od jednog argumenta")
-        else:
-            for word in lista_sa_naredbom[1:2]:
-                argument=word
+            print ("Naredba ne smije imati vise od jednog argumenta")       
+        else:                                           #izvedi ovo ako je dobro upisana naredba
+            for word in lista_sa_naredbom[1:2]:         
+                argument=word                           
             try:
-                os.makedirs(argument)
-            except FileExistsError:
+                os.makedirs(argument)                   #stvaranje direktorija
+            except FileExistsError:                     #ako direktorij postoji, javi ovu gresku
                 print("Ovaj direktorij vec postoji!")
-            except OSError:
+            except OSError:                             #pri javljanju neke druge greske (npr ako nema mjesta na disku) javi ovu gresku
                 print("Stvaranje direktorija nije uspjelo!")
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, povijest)               #upis u povjest
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~rmdir naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
-    elif re.match(r"(rmdir\s+.*)|(rmdir$)", naredba):   #rmdir
-        if re.match(r"rmdir\s*$", naredba):
-            print("Naredba mora primiti argument")
-        elif (len(lista_sa_naredbom)>=3):   #ako naredba ima vise od jednog argumenta javi gresku
+    elif re.match(r"(rmdir\s+.*)|(rmdir$)", naredba):   
+        if re.match(r"rmdir\s*$", naredba):             #regex za ako korisnik upise samo rmdir bez ikakvih argumenata
+            print("Naredba mora primiti argument")      
+        elif (len(lista_sa_naredbom)>=3):               #ako naredba ima vise od jednog argumenta javi gresku
             print ("Naredba ne smije imati vise od jednog argumenta")
-        else:
-            for word in lista_sa_naredbom[1:2]:
+        else:                                           #izvedi ovo kad je naredba dobro upisana
+            for word in lista_sa_naredbom[1:2]:         
                 argument=word
             try:
-                os.rmdir(argument)
+                os.rmdir(argument)                      #brisanje direktorija
             except FileNotFoundError:
-                print("Datoteka nije pronadena!")
+                print("Direktorij nije pronadena!")       #greska koja se ispisuje ako je argument direktorij koji ne postoji
             except OSError:
-                print("Brisanje datoteke nije uspjelo, direktorij nije prazan")
-            upis_u_dat(naredba, povijest)
+                print("Brisanje direktorija nije uspjelo, direktorij nije prazan")     #greska koja se ispisuje kad direktorij koji se brise nije prazan
+            upis_u_dat(naredba, povijest)               #upis u povjest
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~kub naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~              
     elif re.match(r"kub\s*$", naredba):
         broj_za_oduzimanje = 29290290290290290290
