@@ -183,7 +183,7 @@ while True: #Petlja koja vrti prompt
                 
             ls()
             upis_u_dat(naredba, povijest)
-        elif re.match(r"ls\s+-l+[^\-]", naredba):
+        elif re.match(r"ls\s+-l+\s+[^\-]", naredba):
             def ls():
                     from pwd import getpwuid
                     from grp import getgrgid
