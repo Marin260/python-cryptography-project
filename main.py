@@ -152,18 +152,12 @@ while True: #Petlja koja vrti prompt
                     print('Upisali ste krivu adresu')
             upis_u_dat(naredba, povijest)
         elif re.match(r"ls -l\s*$", naredba):
-            def parse_args():
-                parser=argparse.ArgumentParser(description='Izlistaj sve fajlove u direktoriju')
-                parser.add_argument('directory', type=str, nargs='?', default='.')
-                parser.add_argument('--long','-l', action='store_true')
-                return parser.parse_args()
-            def ls(args):
-                
+            def ls():
                     from pwd import getpwuid
                     from grp import getgrgid
                     import pprint
-                    for f in listdir(args):
-                        filestats=os.lstat(os.path.join(args.directory,f))
+                    for f in listdir():
+                        filestats=os.lstat(os.path.join(os.getcwd(),f))
                         mode_chars=['r','w','x']
                         st_perms=bin(filestats.st_mode)[-9:]
                         mode=filetype_char(filestats.st_mode)
@@ -173,21 +167,23 @@ while True: #Petlja koja vrti prompt
                             else:
                                 mode+=mode_chars[i%3] 
                         entry=[mode,str(filestats.st_nlink),getpwuid(filestats.st_uid).pw_name,getgrgid(filestats.st_gid).gr_name,str(filestats.st_size),f]                          
-                        pprint.pprint(entry)               
-            def filetype_char(mode):
+                        pprint.pprint(entry) 
+              
+           def filetype_char(mode):
                 import stat
                 if stat.S_ISDIR(mode):
                     return 'd'
                 if stat.S_ISLNK(mode):
                     return 'l'
                 return '-'
-            def listdir(args):
-               dirs=os.listdir(args.directory)
+            
+           def listdir():
+               dirs=os.listdir(os.getcwd())
                dirs=[dir for dir in dirs if dir[0]!='.']
                return dirs
-            args=parse_args()
-            ls(args)
-            upis_u_dat(naredba, povijest)
+                
+           ls()
+           upis_u_dat(naredba, povijest)
         elif re.match(r"ls\s+-l+[^\-]", naredba):
             def ls():
                     from pwd import getpwuid
