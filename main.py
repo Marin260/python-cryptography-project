@@ -188,6 +188,45 @@ while True: #Petlja koja vrti prompt
             args=parse_args()
             ls(args)
             upis_u_dat(naredba, povijest)
+        elif re.match(r"ls\s+-l+[^\-]", naredba):
+            def ls():
+                    from pwd import getpwuid
+                    from grp import getgrgid
+                    import pprint
+                    for f in listdir():
+                        var=naredba.split()
+                        var=var[1:]
+                        filestats=os.lstat(os.path.join(korak_nazad(var,0),f))
+                        mode_chars=['r','w','x']
+                        st_perms=bin(filestats.st_mode)[-9:]
+                        mode=filetype_char(filestats.st_mode)
+                        for i, perm in enumerate(st_perms):
+                            if perm=='0':
+                                mode+='-'
+                            else:
+                                mode+=mode_chars[i%3] 
+                        entry=[mode,str(filestats.st_nlink),getpwuid(filestats.st_uid).pw_name,getgrgid(filestats.st_gid).gr_name,str(filestats.st_size),f]                          
+                        pprint.pprint(entry) 
+              
+            def filetype_char(mode):
+                import stat
+                if stat.S_ISDIR(mode):
+                    return 'd'
+                if stat.S_ISLNK(mode):
+                    return 'l'
+                return '-'
+            
+            def listdir():
+               var=naredba.split()
+               var=var[1:]
+               dirs=os.listdir(korak_nazad(var,0))
+               dirs=[dir for dir in dirs if dir[0]!='.']
+               return dirs
+                
+            ls()
+            upis_u_dat(naredba, povijest)
+        elif re.match(r"ls -l.*$", naredba):
+            print('Nepostojeci parametar')
         elif re.match(r"ls -[^l]*\s*$", naredba):
             print('Nepostojeci parametar')
             
