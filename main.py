@@ -290,10 +290,10 @@ while True: #Petlja koja vrti prompt
             #argument
             lock.acquire()
             rez = open(adresa_rez, 'a')
-            global broj_za_oduzimanje
+            global broj_za_oduzimanje #djeljiva varijabla
             for i in range(n):
                 broj_za_oduzimanje -= i**3 #oduzima kubove brojeva
-                rez.write('N = {}'.format(broj_za_oduzimanje))
+                rez.write('N = {}'.format(broj_za_oduzimanje)) #zapis meduvrijednosti
                 rez.write('\n')
                 
             rez.write('Kraj threada')
@@ -304,12 +304,11 @@ while True: #Petlja koja vrti prompt
             if id_threada == 1:
                 print('Dretve se prosle barijeru i izvrsile su program')
             
-
         nit1 = th.Thread(target = thread_kub, args=(100000,))        
         nit2 = th.Timer(2, thread_kub, args=(100000, )) #thread pocinje dvije sekunde kasnije
         nit3 = th.Thread(target = thread_kub, args=(100000,))
         
-        nit1.start()
+        nit1.start() #pokretanje threadova
         nit2.start()
         nit3.start()
 
@@ -324,6 +323,6 @@ while True: #Petlja koja vrti prompt
         print('Naredba ne prima argumente')      # ispisuje gresku
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
     elif re.match(r"\s*$", naredba):
-        continue
+        continue #prazna naredba samo pokrece prompt
     else:
         print('pogresna naredba')
