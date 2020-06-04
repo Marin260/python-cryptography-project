@@ -5,7 +5,6 @@ import socket
 import os
 import re
 import time
-import argparse
 import signal
 import sys
 from pathlib import Path #za windows compatibility
