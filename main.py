@@ -1,5 +1,5 @@
 from time import *
-import threading as th
+import threading
 import getpass
 import socket
 import os
@@ -89,24 +89,24 @@ while True: #Petlja koja vrti prompt
             print()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~kill naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            
     elif re.match(r"(kill\s+.*)|(kill$)", naredba): #kill naredba
-        if re.match(r"kill\s*$", naredba):
+        if re.match(r"kill\s*$", naredba):          #regex za samo kill
             print('Naredba prima tocno jedan parametar: naziv signala ili njegov redni broj')
-        elif re.match(r"(kill -2\s*$)|(kill -SIGINT\s*$)|(kill -INT\s*$)", naredba):
+        elif re.match(r"(kill -2\s*$)|(kill -SIGINT\s*$)|(kill -INT\s*$)", naredba):        #regex za signal broj 2
             def upravljac(broj_signala, stog):
                 print('Pristiago je signal broj 2: Program se zavrsava.'.format(broj_signala))
                 sys.exit()
                 return
-            signal.signal(signal.SIGINT,upravljac) 
-            os.kill(os.getpid(), signal.SIGINT)
+            signal.signal(signal.SIGINT,upravljac)   #ceka sigint salje ga upravljacu i on nas obavjestava da je signal dosao
+            os.kill(os.getpid(), signal.SIGINT)      #interrupta i zavrsava program
             upis_u_dat(naredba, povijest)
-        elif re.match(r"(kill -3\s*$)|(kill -SIGQUIT\s*$)|(kill -QUIT\s*$)", naredba):
-            signal.signal(signal.SIGQUIT,signal.SIG_IGN) 
-            os.kill(os.getpid(), signal.SIGQUIT)
+        elif re.match(r"(kill -3\s*$)|(kill -SIGQUIT\s*$)|(kill -QUIT\s*$)", naredba):       #regex za signal broj 3
+            signal.signal(signal.SIGQUIT,signal.SIG_IGN)        #ceka da se desi signal broj 3 sig ign znaci da se signal ignorira
+            os.kill(os.getpid(), signal.SIGQUIT)                #saljemo signal 3 koji je ignoriran 
             print('Signal broj 3 je ignoriran')
             upis_u_dat(naredba, povijest)
-        elif re.match(r"(kill -15\s*$)|(kill -SIGTERM\s*$)|(kill -TERM\s*$)", naredba):
-            signal.signal(signal.SIGTERM,signal.SIG_DFL)
-            os.kill(os.getpid(), signal.SIGTERM)
+        elif re.match(r"(kill -15\s*$)|(kill -SIGTERM\s*$)|(kill -TERM\s*$)", naredba):      #regex za signal broj 15
+            signal.signal(signal.SIGTERM,signal.SIG_DFL)        #ceka da se desi signal broj 3 sig dfl odraduje default funkciju signala
+            os.kill(os.getpid(), signal.SIGTERM)                #saljemo signal broj 15 koji terminatea program
             upis_u_dat(naredba, povijest)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~cd naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     
@@ -124,11 +124,11 @@ while True: #Petlja koja vrti prompt
         
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~date naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~       
     elif re.match(r"(date\s.*)|(date\s*$)", naredba): #date naredba
-        if re.match(r"date\s*$", naredba):
-            print (strftime("%H::%M::%S  %A  %d/%m/%Y"))
+        if re.match(r"date\s*$", naredba):            #regex za samo date
+            print (strftime("%H::%M::%S  %A  %d/%m/%Y"))       #printa sati::minute::sekunde dan u tjednu dan/mjesec/godina
             upis_u_dat(naredba, povijest)
-        elif re.match(r"date -r\s*$", naredba):
-            print (strftime("%d/%m/%Y  %A  %H::%M::%S"))
+        elif re.match(r"date -r\s*$", naredba):       #regex za date -r
+            print (strftime("%d/%m/%Y  %A  %H::%M::%S"))       #printa dan/mjesec/godina dan u tjednu sati::minute::sekunde
             upis_u_dat(naredba, povijest)
         elif re.match(r"date -[^r]\s*$", naredba):
             print('Nepostojeci parametar')
@@ -258,55 +258,8 @@ while True: #Petlja koja vrti prompt
                 print("Brisanje direktorija nije uspjelo, direktorij nije prazan")     #greska koja se ispisuje kad direktorij koji se brise nije prazan
             upis_u_dat(naredba, povijest)               #upis u povjest
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~kub naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~              
-    elif re.match(r"kub\s*$", naredba):
-        broj_za_oduzimanje = 29290290290290290290
-        adresa_rez = kucni_dir + '/rezultat.txt'
-
-        barijera = th.Barrier(3)
-        lock = th.Lock()
-
-        rez = open(adresa_rez, 'r+')
-        rez.truncate(0)
-        rez.close
-        
-        def thread_kub(n):
-            lock.acquire()
-            rez = open(adresa_rez, 'a')
-            global broj_za_oduzimanje
-            for i in range(n):
-                print(i, end=" ")
-                print(broj_za_oduzimanje)
-                broj_za_oduzimanje -= i**3
-                rez.write('N = {}'.format(broj_za_oduzimanje))
-                rez.write('\n')
-                
-            rez.write('Kraj threada')
-            rez.write('\n')
-            rez.close()
-            lock.release()
-            id_threada = barijera.wait()
-            if id_threada == 1:
-                print('Dretve se prosle barijeru i izvrsile su program')
-            
-
-        nit1 = th.Thread(target = thread_kub, args=(100000,))        
-        nit2 = th.Timer(2, thread_kub, args=(100000, ))
-        nit3 = th.Thread(target = thread_kub, args=(100000,))
-        
-        nit1.start()
-        nit2.start()
-        nit3.start()
-
-        nit1.join()
-        nit3.join()
-        nit2.join()
-
-        upis_u_dat(naredba, povijest)
-    elif re.match(r"kub\s+\-+.*\s*", naredba):   # ako korisnik upise
-        print('Naredba ne prima parametre')      # parametre ili
-    elif re.match(r"kub\s+[^\-]+\s*", naredba):  # argumente
-        print('Naredba ne prima argumente')      # ispisuje gresku
-        
+    elif naredba == "kub":
+        print(naredba)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
     elif re.match(r"\s*$", naredba):
         continue
