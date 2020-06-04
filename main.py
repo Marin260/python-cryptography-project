@@ -149,12 +149,12 @@ while True: #Petlja koja vrti prompt
             def lsnohidden(path):
                 for f in os.listdir(path):
                     if not f.startswith('.'):
-                        print (f)
+                        print (f)                     #printa sve datoteke ili direktorije koji nisu skriveni
             if re.match(r"ls\s*$", naredba):
                 lsnohidden(os.getcwd())
             elif re.match(r"ls\s+[^\-]", naredba):
                 try:
-                    lsnohidden(korak_nazad(naredba.split()))
+                    lsnohidden(korak_nazad(naredba.split()))       #implementirana funkcija za apsolutnu adresu iz naredbe cd
                 except OSError:
                     print('Upisali ste krivu adresu')
             upis_u_dat(naredba, lista_za_ispis)
@@ -168,19 +168,19 @@ while True: #Petlja koja vrti prompt
                     if x==0:
                         var=naredba.split()
                         var=var[1:]
-                        filestats=os.lstat(os.path.join(korak_nazad(var),f))
+                        filestats=os.lstat(os.path.join(korak_nazad(var),f))   #ako je x=0 znaci da je ls -l aps_adresa, a ako je x=1 onda je samo ls-l
                     else:
                         filestats=os.lstat(os.path.join(os.getcwd(),f))
                     mode_chars=['r','w','x']
                     st_perms=bin(filestats.st_mode)[-9:]
-                    mode=filetype_char(filestats.st_mode)
+                    mode=filetype_char(filestats.st_mode)    #mode je varijabla u koju spremamo permissionse 
                     for i, perm in enumerate(st_perms):
                         if perm=='0':
                             mode+='-'
                         else:
                             mode+=mode_chars[i%3] 
                     entry=[mode,str(filestats.st_nlink),getpwuid(filestats.st_uid).pw_name,getgrgid(filestats.st_gid).gr_name,str(filestats.st_size),f]                          
-                    pprint.pprint(entry) 
+                    pprint.pprint(entry)     #entry je lista koja sadrzi sve trazene elemente naredbe ls -l i pprint ju ispisuje
               
             def filetype_char(mode):
                 import stat
@@ -188,7 +188,7 @@ while True: #Petlja koja vrti prompt
                     return 'd'
                 if stat.S_ISLNK(mode):
                     return 'l'
-                return '-'
+                return '-'            #fja za ispravan ispis permissionsa
             
             def listdir():
                 if x==0:
@@ -198,14 +198,14 @@ while True: #Petlja koja vrti prompt
                 else:
                     dirs=os.listdir(os.getcwd())
                 dirs=[dir for dir in dirs if dir[0]!='.']
-                return dirs
+                return dirs                         #fja koja vraca sve datoteke/direktorije u obliku liste
                 
             ls()
             upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"ls\s+-l+\s+[^\-]", naredba):
             x=0
             try:   
-                ls()
+                ls()          #fja za ls -l sa argumentom apsolutne adrese 
             except FileNotFoundError:
                 print('Upisali ste krivu adresu')
             upis_u_dat(naredba, lista_za_ispis)
