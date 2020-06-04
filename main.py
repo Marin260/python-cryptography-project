@@ -266,10 +266,14 @@ while True: #Petlja koja vrti prompt
 
         barijera = th.Barrier(3)
         lock = th.Lock()
+
+        try:
+            rez = open(adresa_rez, 'r+')
+            rez.truncate(0)
+            rez.close
+        except FileNotFoundError:
+            pass
         
-        rez = open(adresa_rez, 'r+')
-        rez.truncate(0)
-        rez.close
         
         def thread_kub(n):
             lock.acquire()
