@@ -4,7 +4,6 @@ import getpass
 import socket
 import os
 import re
-import time
 import signal
 import sys
 from pathlib import Path #za windows compatibility
@@ -116,8 +115,6 @@ while True: #Petlja koja vrti prompt
         elif re.match(r"kill\s+[^\-].*", naredba):
             print('Naredba ne prima argumente')
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~cd naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    
-
     elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba    
         if re.match(r"^cd\s*$", naredba):
             os.chdir(kucni_dir) #ako je samo cd onda nas vraca u kucni dir
@@ -130,7 +127,6 @@ while True: #Petlja koja vrti prompt
             upis_u_dat(naredba, povijest)
         else:
             print('Kriva naredba')
-        
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~date naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~       
     elif re.match(r"(date\s.*)|(date\s*$)", naredba): #date naredba
         if re.match(r"date\s*$", naredba):
@@ -255,13 +251,12 @@ while True: #Petlja koja vrti prompt
         barijera = th.Barrier(3) #barijera
         lock = th.Lock() 
 
-        try:
-            rez = open(adresa_rez, 'r+')
+        try:                             #brise sve iz datoteke ako vec postoji
+            rez = open(adresa_rez, 'r+') 
             rez.truncate(0)
             rez.close
         except FileNotFoundError:
             pass
-        
         
         def thread_kub(n): #oduzimanje
             #argument
