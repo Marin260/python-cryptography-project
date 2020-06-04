@@ -1,5 +1,5 @@
 from time import *
-import threading
+import threading as th
 import getpass
 import socket
 import os
@@ -152,23 +152,23 @@ while True: #Petlja koja vrti prompt
             upis_u_dat(naredba, povijest)
         elif re.match(r"ls -l\s*$", naredba):
             def ls():
-                    from pwd import getpwuid
-                    from grp import getgrgid
-                    import pprint
-                    for f in listdir():
-                        filestats=os.lstat(os.path.join(os.getcwd(),f))
-                        mode_chars=['r','w','x']
-                        st_perms=bin(filestats.st_mode)[-9:]
-                        mode=filetype_char(filestats.st_mode)
-                        for i, perm in enumerate(st_perms):
-                            if perm=='0':
-                                mode+='-'
-                            else:
-                                mode+=mode_chars[i%3] 
-                        entry=[mode,str(filestats.st_nlink),getpwuid(filestats.st_uid).pw_name,getgrgid(filestats.st_gid).gr_name,str(filestats.st_size),f]                          
-                        pprint.pprint(entry) 
+                from pwd import getpwuid
+                from grp import getgrgid
+                import pprint
+                for f in listdir():
+                    filestats=os.lstat(os.path.join(os.getcwd(),f))
+                    mode_chars=['r','w','x']
+                    st_perms=bin(filestats.st_mode)[-9:]
+                    mode=filetype_char(filestats.st_mode)
+                    for i, perm in enumerate(st_perms):
+                        if perm=='0':
+                            mode+='-'
+                        else:
+                            mode+=mode_chars[i%3] 
+                    entry=[mode,str(filestats.st_nlink),getpwuid(filestats.st_uid).pw_name,getgrgid(filestats.st_gid).gr_name,str(filestats.st_size),f]                          
+                    pprint.pprint(entry) 
               
-           def filetype_char(mode):
+            def filetype_char(mode):
                 import stat
                 if stat.S_ISDIR(mode):
                     return 'd'
@@ -176,13 +176,13 @@ while True: #Petlja koja vrti prompt
                     return 'l'
                 return '-'
             
-           def listdir():
-               dirs=os.listdir(os.getcwd())
-               dirs=[dir for dir in dirs if dir[0]!='.']
-               return dirs
+            def listdir():
+                dirs=os.listdir(os.getcwd())
+                dirs=[dir for dir in dirs if dir[0]!='.']
+                return dirs
                 
-           ls()
-           upis_u_dat(naredba, povijest)
+            ls()
+            upis_u_dat(naredba, povijest)
         elif re.match(r"ls\s+-l+[^\-]", naredba):
             def ls():
                     from pwd import getpwuid
@@ -257,9 +257,55 @@ while True: #Petlja koja vrti prompt
             except OSError:
                 print("Brisanje direktorija nije uspjelo, direktorij nije prazan")     #greska koja se ispisuje kad direktorij koji se brise nije prazan
             upis_u_dat(naredba, povijest)               #upis u povjest
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~kub naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~              
-    elif naredba == "kub":
-        print(naredba)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~kub naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    elif re.match(r"kub\s*$", naredba):
+        broj_za_oduzimanje = 29290290290290290290
+        adresa_rez = kucni_dir + '/rezultat.txt'
+
+        barijera = th.Barrier(3)
+        lock = th.Lock()
+        
+        rez = open(adresa_rez, 'r+')
+        rez.truncate(0)
+        rez.close
+        
+        def thread_kub(n):
+            lock.acquire()
+            rez = open(adresa_rez, 'a')
+            global broj_za_oduzimanje
+            for i in range(n):
+                print(i, end=" ")
+                print(broj_za_oduzimanje)
+                broj_za_oduzimanje -= i**3
+                rez.write('N = {}'.format(broj_za_oduzimanje))
+                rez.write('\n')
+                
+            rez.write('Kraj threada')
+            rez.write('\n')
+            rez.close()
+            lock.release()
+            id_threada = barijera.wait()
+            if id_threada == 1:
+                print('Dretve se prosle barijeru i izvrsile su program')
+            
+
+        nit1 = th.Thread(target = thread_kub, args=(100000,))        
+        nit2 = th.Timer(2, thread_kub, args=(100000, ))
+        nit3 = th.Thread(target = thread_kub, args=(100000,))
+        
+        nit1.start()
+        nit2.start()
+        nit3.start()
+
+        nit1.join()
+        nit3.join()
+        nit2.join()
+
+        upis_u_dat(naredba, povijest)
+    elif re.match(r"kub\s+\-+.*\s*", naredba):   # ako korisnik upise
+        print('Naredba ne prima parametre')      # parametre ili
+    elif re.match(r"kub\s+[^\-]+\s*", naredba):  # argumente
+        print('Naredba ne prima argumente')      # ispisuje gresku
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
     elif re.match(r"\s*$", naredba):
         continue
