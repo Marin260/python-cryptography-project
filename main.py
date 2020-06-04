@@ -8,12 +8,14 @@ import signal
 import sys
 from pathlib import Path #za windows compatibility
 
-def upis_u_dat(var, ime_dat): #upis naredbi u dat
-    #1.arg naredba za upis
-    #2.arg ime datoteke u koju se upisuje
+def upis_u_dat(var, lista): #upis naredbi u listu
+    lista.append(var)
+    
+def dat(lista, ime_dat): #upis liste u datoteku
     dat = open(ime_dat, 'a')
-    dat.write(var)
-    dat.write('\n')
+    for ele in lista:
+        dat.write(ele)
+        dat.write('\n')
     dat.close()
 
 def korak_nazad(put):
@@ -46,31 +48,32 @@ def korak_nazad(put):
 
 trenutno_vrijeme = strftime("%d.%m.%Y. %H:%M:%S", localtime()) #Vrijeme
 
-print('Pozdrav, dobro dosao...')
-print('Datum i vrijeme vaseg pristupa: {}'.format(trenutno_vrijeme))
+print('Pozdrav, dobro dosao... ({})'.format(trenutno_vrijeme))
 
 #kucni_dir = os.getenv("HOME")  #radi samo s unixom, na windowsu ne
 kucni_dir = str(Path.home())    
 
 povijest = kucni_dir + '/.povijest'
+lista_za_ispis = []
 while True: #Petlja koja vrti prompt
     korisnik, host, adresa = getpass.getuser(), socket.gethostname(), os.path.abspath(os.getcwd())
     naredba = input('[{0}@{1}:{2}]$ '.format(korisnik, host, adresa)) #Prompt/odzivni znak
     if re.match(r"exit\s*$", naredba) or re.match(r'logout\s*$', naredba):
+        dat(lista_za_ispis, povijest)
         break;
     lista_sa_naredbom = naredba.split()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~pwd naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
     if re.match(r"(pwd\s+.*)|(pwd$)", naredba):
         if re.match(r"pwd\s*$", naredba):
             print(os.path.abspath(os.getcwd())) #Ispis adrese u kojoj se korisnik nalazi
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         else:
             print('Naredba ne prima parametre ni argumente')
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~ps naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~           
     elif re.match(r"(ps\s+.*)|(ps$)", naredba): #ps naredba
         if re.match(r"ps\s*$", naredba):
             print(os.getpid()) #Ispis PID-a procesa
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         else:
             print('Nepostojeci parametar ili argument')
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~echo naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            
@@ -78,7 +81,7 @@ while True: #Petlja koja vrti prompt
         if re.match(r"echo\s*$", naredba):
             print('Naredba prima barem jedan argument')
         else:
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
             for word in lista_sa_naredbom[1:]:
                 if re.match(r'^\"(.*\".*)*\"$', word):
                     word = word[1:-1]
@@ -100,16 +103,16 @@ while True: #Petlja koja vrti prompt
                 return
             signal.signal(signal.SIGINT,upravljac)   #ceka sigint salje ga upravljacu
             os.kill(os.getpid(), signal.SIGINT)      #interrupta i zavrsava program
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"(kill\s+\-3\s*$)|(kill\s+\-SIGQUIT\s*$)|(kill\s+\-QUIT\s*$)", naredba):
             signal.signal(signal.SIGQUIT,signal.SIG_IGN)        #ceka da se desi signal broj 3 te ga ignorira
             os.kill(os.getpid(), signal.SIGQUIT)                #salje signal 3
             print('Signal broj 3 je ignoriran')
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"(kill\s+\-15\s*$)|(kill\s+\-SIGTERM\s*$)|(kill\s+\-TERM\s*$)", naredba):
             signal.signal(signal.SIGTERM,signal.SIG_DFL)        #ceka da se desi signal i izvrsava default
             os.kill(os.getpid(), signal.SIGTERM)                #saljemo signal broj 15
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"kill\s+\-.*", naredba):
             print('Krivi parametar')
         elif re.match(r"kill\s+[^\-].*", naredba):
@@ -118,23 +121,23 @@ while True: #Petlja koja vrti prompt
     elif re.match(r"(cd\s+.*)|(cd$)", naredba): #cd naredba    
         if re.match(r"^cd\s*$", naredba):
             os.chdir(kucni_dir) #ako je samo cd onda nas vraca u kucni dir
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"cd\s+(\.{0,2}(\/.*)+)|([^\/]+\/{1})+|([^\/]+)", naredba):
             try:
                 os.chdir(korak_nazad(naredba.split())) #mjenja dir uz pomoc definirane fje
             except OSError: #ako se desi OSError onda je unesena kriva adresa
                 print('Upisana adresa ne postoji') #promjena dir se nece izvest
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         else:
             print('Kriva naredba')
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~date naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~       
     elif re.match(r"(date\s.*)|(date\s*$)", naredba): #date naredba
         if re.match(r"date\s*$", naredba):
             print (strftime("%H::%M::%S  %A  %d/%m/%Y"))       #printa sati::minute::sekunde dan u tjednu dan/mjesec/godina
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"date\s+-r\s*$", naredba):
             print (strftime("%d/%m/%Y  %A  %H::%M::%S"))       #printa dan/mjesec/godina dan u tjednu sati::minute::sekunde
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"date\s+-[^r].*\s*$", naredba):
             print('Nepostojeci parametar')
         else:
@@ -154,7 +157,7 @@ while True: #Petlja koja vrti prompt
                     lsnohidden(korak_nazad(naredba.split()))
                 except OSError:
                     print('Upisali ste krivu adresu')
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"ls -l\s*$", naredba):
             x=1
             def ls():  
@@ -198,14 +201,14 @@ while True: #Petlja koja vrti prompt
                 return dirs
                 
             ls()
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"ls\s+-l+\s+[^\-]", naredba):
             x=0
             try:   
                 ls()
             except FileNotFoundError:
                 print('Upisali ste krivu adresu')
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"ls -l.*$", naredba):
             print('Nepostojeci parametar')
         elif re.match(r"ls -[^l]*\s*$", naredba):
@@ -226,7 +229,7 @@ while True: #Petlja koja vrti prompt
                 print("Ovaj direktorij vec postoji!")
             except OSError:                             #pri javljanju neke druge greske (npr ako nema mjesta na disku) javi ovu gresku
                 print("Stvaranje direktorija nije uspjelo!")
-            upis_u_dat(naredba, povijest)
+            upis_u_dat(naredba, lista_za_ispis)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~rmdir naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
     elif re.match(r"(rmdir\s+.*)|(rmdir$)", naredba):   
         if re.match(r"rmdir\s*$", naredba):
@@ -242,7 +245,7 @@ while True: #Petlja koja vrti prompt
                 print("Direktorij nije pronadena!")       #greska koja se ispisuje ako je argument direktorij koji ne postoji
             except OSError:
                 print("Brisanje direktorija nije uspjelo, direktorij nije prazan")     #greska koja se ispisuje kad direktorij koji se brise nije prazan
-            upis_u_dat(naredba, povijest)               #upis u povjest
+            upis_u_dat(naredba, lista_za_ispis)               #upis u povjest
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~kub naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     elif re.match(r"kub\s*$", naredba):
         broj_za_oduzimanje = 29290290290290290290
@@ -288,7 +291,7 @@ while True: #Petlja koja vrti prompt
         nit3.join()
         nit2.join()
 
-        upis_u_dat(naredba, povijest)
+        upis_u_dat(naredba, lista_za_ispis)
     elif re.match(r"kub\s+\-+.*\s*", naredba):   # ako korisnik upise
         print('Naredba ne prima parametre')      # parametre ili
     elif re.match(r"kub\s+[^\-]+\s*", naredba):  # argumente
