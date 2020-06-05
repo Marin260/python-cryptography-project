@@ -173,11 +173,11 @@ while True: #Petlja koja vrti prompt
                     mode_chars=['r','w','x']              #svi moguci znakovi permissionsa
                     st_perms=bin(filestats.st_mode)[-9:]    #zadnih 9 bitova u binarnom obliku su permissionsi ako je 1 je slovo ako je 0 je -
                     mode=filetype_char(filestats.st_mode)    #mode je varijabla u koju spremamo permissionse 
-                    for i, perm in enumerate(st_perms):
-                        if perm=='0':
+                    for i, perm in enumerate(st_perms):      #petlja koja ide kroz zadnjih 9 binarnih brojeva(permissionse)
+                        if perm=='0':                        #ako je broj 0 vraca -
                             mode+='-'
                         else:
-                            mode+=mode_chars[i%3] 
+                            mode+=mode_chars[i%3]            #inace ako je 1 vraca koje god slovo bi trebalo bit na tom mjestu(r,w ili x) 
                     entry=[mode,str(filestats.st_nlink),getpwuid(filestats.st_uid).pw_name,getgrgid(filestats.st_gid).gr_name,str(filestats.st_size),f]                          
                     pprint.pprint(entry)     #entry je lista koja sadrzi sve trazene elemente naredbe ls -l i pprint ju ispisuje
               
@@ -197,9 +197,9 @@ while True: #Petlja koja vrti prompt
                 else:
                     dirs=os.listdir(os.getcwd())
                 dirs=[dir for dir in dirs if dir[0]!='.']
-                return dirs                         #fja koja vraca sve datoteke/direktorije u obliku liste
+                return dirs                         #fja koja vraca sve datoteke i direktorije koji nisu skriveni u obliku liste
                 
-            ls()
+            ls()                                    #poziv fje koja ispisuje ls -l
             upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"ls\s+-l+\s+[^\-]", naredba):
             x=0
