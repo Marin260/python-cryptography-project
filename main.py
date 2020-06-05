@@ -145,33 +145,33 @@ while True: #Petlja koja vrti prompt
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~ls naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
     elif re.match(r"(ls\s+.*)|(ls$)", naredba): #ls naredba
         if re.match(r"(ls\s+[^\-]+.*)|(ls\s*$)", naredba):
-            def lsnohidden(path):
-                for f in os.listdir(path):
+            def lsnohidden(path):                    #fja za izlistavanje direktorija i datoteka (bez skrivenih)
+                for f in os.listdir(path):           #petlja koja izbacuje sve sto pocinje sa .(skrivene datoteke/direktoriji)
                     if not f.startswith('.'):
-                        print (f)                     #printa sve datoteke ili direktorije koji nisu skriveni
+                        print (f)                     #printa sve datoteke i direktorije koji nisu skriveni
             if re.match(r"ls\s*$", naredba):
-                lsnohidden(os.getcwd())
+                lsnohidden(os.getcwd())               #uzima adresu gdje se trenutno nalazimo
             elif re.match(r"ls\s+[^\-]", naredba):
                 try:
                     lsnohidden(korak_nazad(naredba.split()))       #implementirana funkcija za apsolutnu adresu iz naredbe cd
-                except OSError:
+                except OSError:                                    #ako je upisana nepostojeca adresa (oserror) program nam to javlja porukom
                     print('Upisali ste krivu adresu')
             upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"ls -l\s*$", naredba):
             x=1
             def ls():  
-                from pwd import getpwuid
+                from pwd import getpwuid   #trebaju nam kako bi mogli dobiti uid i gid
                 from grp import getgrgid
                 import pprint
                 for f in listdir():
                     if x==0:
-                        var=naredba.split()
-                        var=var[1:]
+                        var=naredba.split()      #razdvaja naredbu u 3 djela
+                        var=var[1:]              #te ju cita tek od -l(zanemaruje ls)
                         filestats=os.lstat(os.path.join(korak_nazad(var),f))   #ako je x=0 znaci da je ls -l aps_adresa, a ako je x=1 onda je samo ls-l
                     else:
                         filestats=os.lstat(os.path.join(os.getcwd(),f))
-                    mode_chars=['r','w','x']
-                    st_perms=bin(filestats.st_mode)[-9:]
+                    mode_chars=['r','w','x']              #svi moguci znakovi permissionsa
+                    st_perms=bin(filestats.st_mode)[-9:]    #zadnih 9 bitova u binarnom obliku su permissionsi ako je 1 je slovo ako je 0 je -
                     mode=filetype_char(filestats.st_mode)    #mode je varijabla u koju spremamo permissionse 
                     for i, perm in enumerate(st_perms):
                         if perm=='0':
@@ -181,13 +181,13 @@ while True: #Petlja koja vrti prompt
                     entry=[mode,str(filestats.st_nlink),getpwuid(filestats.st_uid).pw_name,getgrgid(filestats.st_gid).gr_name,str(filestats.st_size),f]                          
                     pprint.pprint(entry)     #entry je lista koja sadrzi sve trazene elemente naredbe ls -l i pprint ju ispisuje
               
-            def filetype_char(mode):
+            def filetype_char(mode):      #fja za prvo slovo permissionsa
                 import stat
-                if stat.S_ISDIR(mode):
+                if stat.S_ISDIR(mode):    #ako je direktorij vrati d
                     return 'd'
-                if stat.S_ISLNK(mode):
+                if stat.S_ISLNK(mode):     #ako je symbolic link vrati l
                     return 'l'
-                return '-'            #fja za ispravan ispis permissionsa
+                return '-'                 #ako je datoteka bilo kojeg tipa vrati -
             
             def listdir():
                 if x==0:
@@ -205,10 +205,10 @@ while True: #Petlja koja vrti prompt
             x=0
             try:   
                 ls()          #fja za ls -l sa argumentom apsolutne adrese 
-            except FileNotFoundError:
+            except FileNotFoundError:                  #ako apsolutna adresa ne postoji javlja nam gresku
                 print('Upisali ste krivu adresu')
             upis_u_dat(naredba, lista_za_ispis)
-        elif re.match(r"ls -l.*$", naredba):
+        elif re.match(r"ls -l.*$", naredba):          #petlje za pogresne parametre
             print('Nepostojeci parametar')
         elif re.match(r"ls -[^l]*\s*$", naredba):
             print('Nepostojeci parametar')
