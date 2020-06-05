@@ -6,7 +6,6 @@ import os
 import re
 import signal
 import sys
-from pathlib import Path #za windows compatibility
 
 def upis_u_dat(var, lista): #upis naredbi u listu
     #1.arg je string koji dodajemo listi
@@ -54,8 +53,8 @@ trenutno_vrijeme = strftime("%d.%m.%Y. %H:%M:%S", localtime()) #Vrijeme
 
 print('Pozdrav, dobro dosao... ({})'.format(trenutno_vrijeme))
 
-#kucni_dir = os.getenv("HOME")  #radi samo s unixom, na windowsu ne
-kucni_dir = str(Path.home())    
+kucni_dir = os.getenv("HOME")  #radi samo s unixom, na windowsu ne
+  
 
 povijest = kucni_dir + '/.povijest'
 lista_za_ispis = []
@@ -150,49 +149,49 @@ while True: #Petlja koja vrti prompt
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~ls naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
     elif re.match(r"(ls\s+.*)|(ls$)", naredba): #ls naredba
         if re.match(r"(ls\s+[^\-]+.*)|(ls\s*$)", naredba):
-            def lsnohidden(path):
-                for f in os.listdir(path):
+            def lsnohidden(path):                    #fja za izlistavanje direktorija i datoteka (bez skrivenih)
+                for f in os.listdir(path):           #petlja koja izbacuje sve sto pocinje sa .(skrivene datoteke/direktoriji)
                     if not f.startswith('.'):
-                        print (f)
+                        print (f)                     #printa sve datoteke i direktorije koji nisu skriveni
             if re.match(r"ls\s*$", naredba):
-                lsnohidden(os.getcwd())
+                lsnohidden(os.getcwd())               #uzima adresu gdje se trenutno nalazimo
             elif re.match(r"ls\s+[^\-]", naredba):
                 try:
-                    lsnohidden(korak_nazad(naredba.split()))
-                except OSError:
+                    lsnohidden(korak_nazad(naredba.split()))       #implementirana funkcija za apsolutnu adresu iz naredbe cd
+                except OSError:                                    #ako je upisana nepostojeca adresa (oserror) program nam to javlja porukom
                     print('Upisali ste krivu adresu')
             upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"ls -l\s*$", naredba):
             x=1
             def ls():  
-                from pwd import getpwuid
+                from pwd import getpwuid   #trebaju nam kako bi mogli dobiti uid i gid
                 from grp import getgrgid
                 import pprint
                 for f in listdir():
                     if x==0:
-                        var=naredba.split()
-                        var=var[1:]
-                        filestats=os.lstat(os.path.join(korak_nazad(var),f))
+                        var=naredba.split()      #razdvaja naredbu u 3 djela
+                        var=var[1:]              #te ju cita tek od -l(zanemaruje ls)
+                        filestats=os.lstat(os.path.join(korak_nazad(var),f))   #ako je x=0 znaci da je ls -l aps_adresa, a ako je x=1 onda je samo ls-l
                     else:
                         filestats=os.lstat(os.path.join(os.getcwd(),f))
-                    mode_chars=['r','w','x']
-                    st_perms=bin(filestats.st_mode)[-9:]
-                    mode=filetype_char(filestats.st_mode)
-                    for i, perm in enumerate(st_perms):
-                        if perm=='0':
+                    mode_chars=['r','w','x']              #svi moguci znakovi permissionsa
+                    st_perms=bin(filestats.st_mode)[-9:]    #zadnih 9 bitova u binarnom obliku su permissionsi ako je 1 je slovo ako je 0 je -
+                    mode=filetype_char(filestats.st_mode)    #mode je varijabla u koju spremamo permissionse 
+                    for i, perm in enumerate(st_perms):      #petlja koja ide kroz zadnjih 9 binarnih brojeva(permissionse)
+                        if perm=='0':                        #ako je broj 0 vraca -
                             mode+='-'
                         else:
-                            mode+=mode_chars[i%3] 
+                            mode+=mode_chars[i%3]            #inace ako je 1 vraca koje god slovo bi trebalo bit na tom mjestu(r,w ili x) 
                     entry=[mode,str(filestats.st_nlink),getpwuid(filestats.st_uid).pw_name,getgrgid(filestats.st_gid).gr_name,str(filestats.st_size),f]                          
-                    pprint.pprint(entry) 
+                    pprint.pprint(entry)     #entry je lista koja sadrzi sve trazene elemente naredbe ls -l i pprint ju ispisuje
               
-            def filetype_char(mode):
+            def filetype_char(mode):      #fja za prvo slovo permissionsa
                 import stat
-                if stat.S_ISDIR(mode):
+                if stat.S_ISDIR(mode):    #ako je direktorij vrati d
                     return 'd'
-                if stat.S_ISLNK(mode):
+                if stat.S_ISLNK(mode):     #ako je symbolic link vrati l
                     return 'l'
-                return '-'
+                return '-'                 #ako je datoteka bilo kojeg tipa vrati -
             
             def listdir():
                 if x==0:
@@ -202,18 +201,18 @@ while True: #Petlja koja vrti prompt
                 else:
                     dirs=os.listdir(os.getcwd())
                 dirs=[dir for dir in dirs if dir[0]!='.']
-                return dirs
+                return dirs                         #fja koja vraca sve datoteke i direktorije koji nisu skriveni u obliku liste
                 
-            ls()
+            ls()                                    #poziv fje koja ispisuje ls -l
             upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"ls\s+-l+\s+[^\-]", naredba):
             x=0
             try:   
-                ls()
-            except FileNotFoundError:
+                ls()          #fja za ls -l sa argumentom apsolutne adrese 
+            except FileNotFoundError:                  #ako apsolutna adresa ne postoji javlja nam gresku
                 print('Upisali ste krivu adresu')
             upis_u_dat(naredba, lista_za_ispis)
-        elif re.match(r"ls -l.*$", naredba):
+        elif re.match(r"ls -l.*$", naredba):          #petlje za pogresne parametre
             print('Nepostojeci parametar')
         elif re.match(r"ls -[^l]*\s*$", naredba):
             print('Nepostojeci parametar')
