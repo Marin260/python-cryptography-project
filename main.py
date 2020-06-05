@@ -6,7 +6,6 @@ import os
 import re
 import signal
 import sys
-from pathlib import Path #za windows compatibility
 
 def upis_u_dat(var, lista): #upis naredbi u listu
     lista.append(var)
@@ -50,8 +49,8 @@ trenutno_vrijeme = strftime("%d.%m.%Y. %H:%M:%S", localtime()) #Vrijeme
 
 print('Pozdrav, dobro dosao... ({})'.format(trenutno_vrijeme))
 
-#kucni_dir = os.getenv("HOME")  #radi samo s unixom, na windowsu ne
-kucni_dir = str(Path.home())    
+kucni_dir = os.getenv("HOME")  #radi samo s unixom, na windowsu ne
+  
 
 povijest = kucni_dir + '/.povijest'
 lista_za_ispis = []
