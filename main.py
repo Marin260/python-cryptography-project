@@ -9,11 +9,15 @@ import sys
 from pathlib import Path #za windows compatibility
 
 def upis_u_dat(var, lista): #upis naredbi u listu
-    lista.append(var)
+    #1.arg je string koji dodajemo listi
+    #2.arg je lista u koju dodajemo string
+    lista.append(var) #dodajemo novi element u list
     
 def dat(lista, ime_dat): #upis liste u datoteku
+    #1.arg lista koju upisujemo u datoteku
+    #2.arg datoteka u koju spremamo elemente iz liste
     dat = open(ime_dat, 'a')
-    for ele in lista:
+    for ele in lista: #svaki element liste upisujemo u datoteku kao novi red
         dat.write(ele)
         dat.write('\n')
     dat.close()
@@ -27,7 +31,7 @@ def korak_nazad(put):
         trenutna = ""
         trenutna = trenutna.join(put[1]) # string koji sadrzi samo adresu
         trenutna = trenutna.split('/') 
-        absolutna = os.path.abspath(os.getcwd())
+        absolutna = os.path.abspath(os.getcwd())# absolutna adresa do radnog direktorija direktorija
         absolutna = absolutna.split('/')
         iste = False
         if len(trenutna) > 1: 
@@ -56,10 +60,10 @@ kucni_dir = str(Path.home())
 povijest = kucni_dir + '/.povijest'
 lista_za_ispis = []
 while True: #Petlja koja vrti prompt
-    korisnik, host, adresa = getpass.getuser(), socket.gethostname(), os.path.abspath(os.getcwd())
+    korisnik, host, adresa = getpass.getuser(), socket.gethostname(), os.path.abspath(os.getcwd()) #varijable koje cine prompt
     naredba = input('[{0}@{1}:{2}]$ '.format(korisnik, host, adresa)) #Prompt/odzivni znak
-    if re.match(r"exit\s*$", naredba) or re.match(r'logout\s*$', naredba):
-        dat(lista_za_ispis, povijest)
+    if re.match(r"exit\s*$", naredba) or re.match(r'logout\s*$', naredba): #ako je unos exit ili logout onda se prekida program
+        dat(lista_za_ispis, povijest) #upis naredbi iz trenutna sesije u datoteku 
         break;
     lista_sa_naredbom = naredba.split()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~pwd naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
@@ -81,7 +85,7 @@ while True: #Petlja koja vrti prompt
         if re.match(r"echo\s*$", naredba):
             print('Naredba prima barem jedan argument')
         else:
-            upis_u_dat(naredba, lista_za_ispis)
+            upis_u_dat(naredba, lista_za_ispis) # upis naredbe u listu
             for word in lista_sa_naredbom[1:]:
                 if re.match(r'^\"(.*\".*)*\"$', word):
                     word = word[1:-1]
@@ -103,16 +107,16 @@ while True: #Petlja koja vrti prompt
                 return
             signal.signal(signal.SIGINT,upravljac)   #ceka sigint salje ga upravljacu
             os.kill(os.getpid(), signal.SIGINT)      #interrupta i zavrsava program
-            upis_u_dat(naredba, lista_za_ispis)
+            upis_u_dat(naredba, lista_za_ispis)      # upis naredbe u listu
         elif re.match(r"(kill\s+\-3\s*$)|(kill\s+\-SIGQUIT\s*$)|(kill\s+\-QUIT\s*$)", naredba):
             signal.signal(signal.SIGQUIT,signal.SIG_IGN)        #ceka da se desi signal broj 3 te ga ignorira
             os.kill(os.getpid(), signal.SIGQUIT)                #salje signal 3
             print('Signal broj 3 je ignoriran')
-            upis_u_dat(naredba, lista_za_ispis)
+            upis_u_dat(naredba, lista_za_ispis)                 # upis naredbe u listu
         elif re.match(r"(kill\s+\-15\s*$)|(kill\s+\-SIGTERM\s*$)|(kill\s+\-TERM\s*$)", naredba):
             signal.signal(signal.SIGTERM,signal.SIG_DFL)        #ceka da se desi signal i izvrsava default
             os.kill(os.getpid(), signal.SIGTERM)                #saljemo signal broj 15
-            upis_u_dat(naredba, lista_za_ispis)
+            upis_u_dat(naredba, lista_za_ispis)                 # upis naredbe u listu
         elif re.match(r"kill\s+\-.*", naredba):
             print('Krivi parametar')
         elif re.match(r"kill\s+[^\-].*", naredba):
@@ -123,18 +127,18 @@ while True: #Petlja koja vrti prompt
             os.chdir(kucni_dir) #ako je samo cd onda nas vraca u kucni dir
             upis_u_dat(naredba, lista_za_ispis)
         elif re.match(r"cd\s+(\.{0,2}(\/.*)+)|([^\/]+\/{1})+|([^\/]+)", naredba):
-            try:
+            try:        #mjenjamo direktoriji, u slucaju OS greske znamo da direktoriji ne postoji
                 os.chdir(korak_nazad(naredba.split())) #mjenja dir uz pomoc definirane fje
             except OSError: #ako se desi OSError onda je unesena kriva adresa
                 print('Upisana adresa ne postoji') #promjena dir se nece izvest
-            upis_u_dat(naredba, lista_za_ispis)
+            upis_u_dat(naredba, lista_za_ispis) # upis naredbe u listu
         else:
             print('Kriva naredba')
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~date naredba~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~       
     elif re.match(r"(date\s.*)|(date\s*$)", naredba): #date naredba
         if re.match(r"date\s*$", naredba):
             print (strftime("%H::%M::%S  %A  %d/%m/%Y"))       #printa sati::minute::sekunde dan u tjednu dan/mjesec/godina
-            upis_u_dat(naredba, lista_za_ispis)
+            upis_u_dat(naredba, lista_za_ispis)                
         elif re.match(r"date\s+-r\s*$", naredba):
             print (strftime("%d/%m/%Y  %A  %H::%M::%S"))       #printa dan/mjesec/godina dan u tjednu sati::minute::sekunde
             upis_u_dat(naredba, lista_za_ispis)
@@ -252,7 +256,7 @@ while True: #Petlja koja vrti prompt
         adresa_rez = kucni_dir + '/rezultat.txt' #datoteka za meduvrijednosti
 
         barijera = th.Barrier(3) #barijera
-        lock = th.Lock() 
+        lock = th.Lock()         #lokot za threadove
 
         try:                             #brise sve iz datoteke ako vec postoji
             rez = open(adresa_rez, 'r+') 
@@ -262,13 +266,13 @@ while True: #Petlja koja vrti prompt
             pass
         
         def thread_kub(n): #oduzimanje
-            #argument
-            lock.acquire()
+            #argument je broj do kojeg ce for petlja vrtiti
+            lock.acquire()           #ulazi u kriticnu sekciju i zatvara ulaz drugima
             rez = open(adresa_rez, 'a')
             global broj_za_oduzimanje #djeljiva varijabla
             for i in range(n):
                 broj_za_oduzimanje -= i**3 #oduzima kubove brojeva
-                rez.write('N = {}'.format(broj_za_oduzimanje)) #zapis meduvrijednosti
+                rez.write('N = {}'.format(broj_za_oduzimanje)) #zapis meduvrijednosti u datoteku
                 rez.write('\n')
                 
             rez.write('Kraj threada')
@@ -279,19 +283,19 @@ while True: #Petlja koja vrti prompt
             if id_threada == 1:
                 print('Dretve se prosle barijeru i izvrsile su program')
             
-        nit1 = th.Thread(target = thread_kub, args=(100000,))        
-        nit2 = th.Timer(2, thread_kub, args=(100000, )) #thread pocinje dvije sekunde kasnije
-        nit3 = th.Thread(target = thread_kub, args=(100000,))
+        nit1 = th.Thread(target = thread_kub, args=(100000,))    #novi thread
+        nit2 = th.Timer(2, thread_kub, args=(100000, ))          #thread pocinje dvije sekunde kasnije
+        nit3 = th.Thread(target = thread_kub, args=(100000,))    #novi thread
         
-        nit1.start() #pokretanje threadova
-        nit2.start()
-        nit3.start()
+        nit1.start() #
+        nit2.start() #pokretanje threadova
+        nit3.start() #
 
-        nit1.join()
-        nit3.join()
-        nit2.join()
+        nit1.join() #
+        nit3.join() #program ceka da se threadovi izvrse
+        nit2.join() #
 
-        upis_u_dat(naredba, lista_za_ispis)
+        upis_u_dat(naredba, lista_za_ispis)      # upis naredbe u listu
     elif re.match(r"kub\s+\-+.*\s*", naredba):   # ako korisnik upise
         print('Naredba ne prima parametre')      # parametre ili
     elif re.match(r"kub\s+[^\-]+\s*", naredba):  # argumente
