@@ -104,18 +104,18 @@ while True: #Petlja koja vrti prompt
                 print('Pristiago je signal broj 2: Program se zavrsava.'.format(broj_signala))
                 sys.exit()
                 return
+            upis_u_dat(naredba, lista_za_ispis)      # upis naredbe u listu
             signal.signal(signal.SIGINT,upravljac)   #ceka sigint salje ga upravljacu
             os.kill(os.getpid(), signal.SIGINT)      #interrupta i zavrsava program
-            upis_u_dat(naredba, lista_za_ispis)      # upis naredbe u listu
         elif re.match(r"(kill\s+\-3\s*$)|(kill\s+\-SIGQUIT\s*$)|(kill\s+\-QUIT\s*$)", naredba):
+            upis_u_dat(naredba, lista_za_ispis)                 # upis naredbe u listu
             signal.signal(signal.SIGQUIT,signal.SIG_IGN)        #ceka da se desi signal broj 3 te ga ignorira
             os.kill(os.getpid(), signal.SIGQUIT)                #salje signal 3
             print('Signal broj 3 je ignoriran')
-            upis_u_dat(naredba, lista_za_ispis)                 # upis naredbe u listu
         elif re.match(r"(kill\s+\-15\s*$)|(kill\s+\-SIGTERM\s*$)|(kill\s+\-TERM\s*$)", naredba):
+            upis_u_dat(naredba, lista_za_ispis)                 # upis naredbe u listu
             signal.signal(signal.SIGTERM,signal.SIG_DFL)        #ceka da se desi signal i izvrsava default
             os.kill(os.getpid(), signal.SIGTERM)                #saljemo signal broj 15
-            upis_u_dat(naredba, lista_za_ispis)                 # upis naredbe u listu
         elif re.match(r"kill\s+\-.*", naredba):
             print('Krivi parametar')
         elif re.match(r"kill\s+[^\-].*", naredba):
